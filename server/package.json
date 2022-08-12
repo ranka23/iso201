@@ -1,5 +1,5 @@
 {
-  "name": "iso201",
+  "name": "iso201_server",
   "version": "1.0.0",
   "description": "The iso201.com webserver",
   "main": "src/server.ts",
