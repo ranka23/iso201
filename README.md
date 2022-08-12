@@ -1,5 +1,4 @@
-# iso201.com
-## Content for Content Creators
+# iso201.com - Content for Content Creators
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
