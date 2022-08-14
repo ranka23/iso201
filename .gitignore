@@ -33,3 +33,4 @@ bin*
 # typescript
 /web/*.tsbuildinfo
 /web/next-env.d.ts
+server/.env

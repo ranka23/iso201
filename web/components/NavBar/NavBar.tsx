@@ -1,56 +1,29 @@
 import Image from "next/image"
-import Search from "../Search/Search"
+import Search from "./Search"
+import Link from "next/link"
+import SocialMedia from "./SocialMedia"
+import LoginSubscribe from "./LoginSubscribe"
+import Links from "./Links"
+import logo from '../../public/logo.png'
 
 const NavBar = () => {
   return (
-    <div className="px-6 py-4 flex items-center font-medium">
-      <Image
-        width={40}
-        height={40}
-        alt="logo"
-        className=""
-        src="/logo_120.png"
-      />
-      <Links />
-      <Search />
+    <div className="p-3 flex items-center justify-between">
+      <div className="flex grow items-center">
+        <Link href={"/"}>
+          <a className="flex items-center">
+            <Image objectFit="contain" alt="iso201 logo" src={logo} />
+          </a>
+        </Link>
+        <Search />
+        <Links />
+      </div>
+      <div className="flex items-center">
+        <LoginSubscribe />
+        <SocialMedia />
+      </div>
     </div>
   )
 }
 
 export default NavBar
-
-interface LinkProp {
-  name: string
-  href: string
-}
-
-const Links = () => {
-  return (
-    <>
-      {links.map((link) => (
-        <a
-          className="text-white pl-6 hover:opacity-70 transition-opacity"
-          key={link.href}
-          href={link.href}
-        >
-          {link.name}
-        </a>
-      ))}
-    </>
-  )
-}
-
-const links = [
-  {
-    name: "Videos",
-    href: "/videos",
-  },
-  {
-    name: "Images",
-    href: "/images",
-  },
-  {
-    name: "Audio",
-    href: "/audio",
-  },
-]
