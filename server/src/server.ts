@@ -4,12 +4,10 @@ import { Client as ESClient } from "@elastic/elasticsearch"
 import { Client as PGClient } from "pg"
 import helmet from "helmet"
 import cors from "cors"
-import logger from "./utils/logger"
+import log from "./utils/logger"
 import auth from "./routes/auth"
 import assets from "./routes/assets"
 import subscriptions from "./routes/subscriptions"
-
-const log = logger()
 
 const port = process.env.PORT || 3000
 const app = express()
@@ -30,14 +28,17 @@ const postgresClient = new PGClient({
 })
 
 // 404 Middleware
+/*
+
 app.use((req, res, next) => {
   res.status(404)
-  if (req.accepts("json")) {
+  if (req.accepts("json") && ) {
     res.send({ error: "Sorry, request not found" })
   }
   next()
 })
 
+ */
 postgresClient.connect((err) => {
   if (err) {
     log.debug("Postgres Connection Error: ", err)
@@ -45,7 +46,7 @@ postgresClient.connect((err) => {
     // After postgres client successfully connects, we register the routes
     app.use("/api/v0/auth", auth)
     app.use("/api/v0/assets", assets)
-    app.use("api/v0/subscriptions", subscriptions)
+    app.use("/api/v0/subscriptions", subscriptions)
 
     // Pass DB clients across all express routes and controllers for reuse
     app.locals.pg = postgresClient

@@ -50,9 +50,13 @@ const prodLogger = (): Logger => {
   })
 }
 
-export default () => {
+const logger = () => {
   if (process.env.NODE_ENV === "production") {
     return prodLogger()
   }
   return devLogger()
 }
+
+const log = logger()
+
+export default log

@@ -49,6 +49,9 @@ const Pricing = () => {
           * Only usage rights are granted. Re-sale or distribution of assets will
           lead to legal action.
         </p>
+        <p className=" text-xs text-center">
+          ** Price not inclusive of taxes and processing charges
+        </p>
       </div>
     </div>
   )

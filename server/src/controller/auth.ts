@@ -1,11 +1,13 @@
 import { CookieOptions, Request, Response } from "express"
 import jwt from "jsonwebtoken"
 import User from "../model/User"
-import getGoogleOAuthTokens from "../utils/getGoogleOAuthToken"
-import { signToken } from "../utils/jwt"
-import servErr from "../utils/servErr"
+import getGoogleOAuthTokens from "../services/google"
+import { signToken } from "../services/jwt"
 import "dotenv/config"
 import { getPG } from "../utils/getClients"
+import log from "../utils/logger"
+import "dotenv/config"
+import errors from "../constants/errors"
 
 export const login = async (req: Request, res: Response) => {
   // get code from qs
@@ -20,10 +22,9 @@ export const login = async (req: Request, res: Response) => {
     const { email, email_verified, name, picture } = googleUser
 
     if (!email_verified) {
-      return res.status(403).json({
-        error:
-          "Unverified Google account. Please verify your email address with Google and try again.",
-      })
+      return res
+        .status(403)
+        .redirect(`${process.env.ORIGIN}/error?name=${errors.unverified_email}`)
     }
 
     // upsert user
@@ -36,20 +37,20 @@ export const login = async (req: Request, res: Response) => {
       new Date().getTime()
     ).create(getPG(req))
 
-    if (user) {
+    if (user?.id && user?.email) {
       //TODO: Send a welcome email to the user
 
       // create access & refresh tokens
-      const accessToken = signToken(
+      const accessToken = await signToken(
         {
-          id: user.id.toString(),
-          email: user.email,
-          isPro: user.isPro,
+          id: user?.id?.toString(),
+          email: user?.email,
+          pro: user?.pro,
         },
         process.env.JWT_ACCESS_TOKEN_EXPIRY as string,
         process.env.JWT_ACCESS_TOKEN_SECRET as string
       )
-      const refreshToken = signToken(
+      const refreshToken = await signToken(
         {
           id: user.id.toString(),
           email: user.email,
@@ -67,25 +68,29 @@ export const login = async (req: Request, res: Response) => {
         sameSite: "lax",
         secure: false,
       }
-      res.cookie("accessToken", accessToken, cookieOptions)
-      res.cookie("refeshToken", refreshToken, {
+      res.cookie("accessToken", `Bearer ${accessToken}`, cookieOptions)
+      res.cookie("refeshToken", `Bearer ${refreshToken}`, {
         ...cookieOptions,
         maxAge: 3.154e10, // 1 year
       })
 
       // redirect back to client
-      if (user.isPro) {
-        res.redirect(process.env.ORIGIN as string)
+      if (user.pro) {
+        return res.redirect(process.env.ORIGIN as string)
       } else {
-        res.redirect(`${process.env.ORIGIN}/subscribe`)
+        return res.redirect(`${process.env.ORIGIN}/subscribe`)
       }
     } else {
       return res
         .status(500)
-        .json({ error: "Failed to create user" })
-        .redirect("/")
+        .redirect(
+          `${process.env.ORIGIN}/error?name=${errors.create_user_error}`
+        )
     }
   } catch (error: any) {
-    servErr(res)
+    log.error("LOGIN CONTROLLER ERROR: ", error)
+    return res
+      .status(403)
+      .redirect(`${process.env.ORIGIN}/error?name=${errors.login_error}`)
   }
 }

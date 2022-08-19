@@ -1,4 +1,5 @@
 import axios from 'axios'
+import "dotenv/config"
 
 interface GoogleTokenResponse {
   access_token: string
