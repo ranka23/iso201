@@ -3,12 +3,14 @@ import { createClient } from "redis"
 
 const client = createClient()
 
+client.connect()
+
 client.on("connect", () => {
-  log.debug(`Redis Client connected`)
+  log.info(`Redis Client connected`)
 })
 
 client.on("ready", () => {
-  log.debug("Redis Client ready to use..")
+  log.info("Redis Client ready to use..")
 })
 
 client.on("error", (err: any) => {
@@ -16,7 +18,7 @@ client.on("error", (err: any) => {
 })
 
 client.on("end", () => {
-  log.debug("Redis Client disconnected")
+  log.info("Redis Client disconnected")
 })
 
 process.on("SIGINT", () => {

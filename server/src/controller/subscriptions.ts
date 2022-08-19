@@ -7,7 +7,7 @@ import {
 import log from "../utils/logger"
 import servErr from "../utils/servErr"
 
-export const createSubscription = async (_req: Request, res: Response) => {
+export const createPaypalSubscription = async (_req: Request, res: Response) => {
   try {
     // @ts-ignore
     const order = await createPaypalOrder(getPaypalOrderData())
@@ -20,7 +20,7 @@ export const createSubscription = async (_req: Request, res: Response) => {
   }
 }
 
-export const captureSubscription = async (req: Request, res: Response) => {
+export const capturePaypalSubscription = async (req: Request, res: Response) => {
   const { orderID } = req.body
 
   console.log("Order ID: ", orderID)

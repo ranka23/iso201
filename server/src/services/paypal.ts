@@ -11,6 +11,7 @@ const generatePaypalAccessToken = async () => {
   const paypalAuthTokenUrl = `${url}/v1/oauth2/token`
   try {
     const token = await redis.get("paypalAccessToken")
+
     if (token && token.length > 10) {
       return token
     }
@@ -23,8 +24,9 @@ const generatePaypalAccessToken = async () => {
         password: secret,
       },
     })
-    const { access_token, expires_in } = res.data.access_token
+    const { access_token, expires_in } = res.data
 
+    // Cache paypal access token in redis
     redis.set("paypalAccessToken", access_token as string, {
       EX: expires_in - 60,
     })
@@ -91,27 +93,27 @@ export const getPaypalOrderData = () => {
       {
         items: [
           {
-            name: "1 Year Subscription",
+            name: "One Year Subscription",
             description:
               "365 days of unlimited access to all our digital assets",
             quantity: "1",
             unit_amount: {
               currency_code: currency,
-              value: price.toString(),
+              value: "60.00",
             },
           },
         ],
         amount: {
           currency_code: currency,
-          value: total,
+          value: "30.00",
           breakdown: {
-            /* discount: {
-                currency_code: currency,
-                value: itemDiscount.toString(),
-              }, */
+            discount: {
+              currency_code: currency,
+              value: "30.00"
+            },
             item_total: {
               currency_code: currency,
-              value: total.toString(),
+              value: "60.00",
             },
           },
         },

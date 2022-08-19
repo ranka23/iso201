@@ -1,11 +1,11 @@
 import express from "express"
-import { captureSubscription, createSubscription } from "../controller/subscriptions"
+import { capturePaypalSubscription, createPaypalSubscription } from "../controller/subscriptions"
 // import { verifyAuthToken } from "../utils/jwt"
 
 const router = express.Router()
 
-router.post("/create", createSubscription)
+router.post("/paypal/create", createPaypalSubscription)
 
-router.post('/:subscriptionID/capture', captureSubscription)
+router.post('/paypal/:subscriptionID/capture', capturePaypalSubscription)
 
 export default router
