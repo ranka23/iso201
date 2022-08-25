@@ -1,0 +1,51 @@
+{
+  "name": "iso201_web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The iso201.com frontend",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.2.1",
+    "@paypal/react-paypal-js": "^7.8.1",
+    "@solana/pay": "^0.2.1",
+    "@solana/web3.js": "^1.53.0",
+    "@types/cookie": "^0.5.1",
+    "axios": "^0.27.2",
+    "axios-auth-refresh": "^3.3.3",
+    "bignumber.js": "^9.1.0",
+    "cookie": "^0.5.0",
+    "cookie-parser": "^1.4.6",
+    "dayjs": "^1.11.5",
+    "jsonwebtoken": "^8.5.1",
+    "nanoid": "3.3.4",
+    "next": "12.2.5",
+    "nodemailer": "^6.7.8",
+    "pg": "^8.7.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "redis": "^4.2.0",
+    "winston": "^3.8.1"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.3",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/morgan": "^1.9.3",
+    "@types/node": "18.7.1",
+    "@types/nodemailer": "^6.4.5",
+    "@types/pg": "^8.6.5",
+    "@types/react": "18.0.17",
+    "@types/react-dom": "18.0.6",
+    "@types/redis": "^4.0.11",
+    "autoprefixer": "^10.4.8",
+    "eslint": "8.21.0",
+    "eslint-config-next": "12.2.5",
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8",
+    "typescript": "4.7.4"
+  }
+}
