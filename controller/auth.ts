@@ -5,6 +5,7 @@ import getGoogleOAuthTokens from "services/google"
 import { clearAuthCookies, signAndSetJWTTokens, verifyRefreshToken } from "services/jwt"
 import log from "utils/logger"
 import errors from "constants/errors"
+import Subscription from "../model/Subscription"
 
 export const login = async (req: NextApiRequest, res: NextApiResponse) => {
   // get code from qs
@@ -17,7 +18,7 @@ export const login = async (req: NextApiRequest, res: NextApiResponse) => {
     const googleUser = jwt.decode(id_token) as GoogleUser
 
     const { email, email_verified, name } = googleUser
-
+    // if email is verified by Google
     if (!email_verified) {
       return res
         .status(403)
@@ -76,7 +77,7 @@ export const refreshAuthToken = async (
   if (!refreshToken) {
     console.log("No refresh token", refreshToken)
     return res
-      .status(403)
+      .status(308)
       .redirect(
         `${process.env.ORIGIN}/error?code=${errors.refresh_token_not_found.code}&message=${errors.refresh_token_not_found.message}`
       )

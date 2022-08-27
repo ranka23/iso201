@@ -3,12 +3,13 @@ import jwt from "jsonwebtoken"
 import errors from "constants/errors"
 
 const withAuth =
-  (handler: NextApiHandler) => (req: NextApiRequest, res: NextApiResponse) =>
-    new Promise<NextApiHandler>((resolve, reject) => {
+  (handler: NextApiHandler) => (req: NextApiRequest, res: NextApiResponse) => {
       const accessToken = req.cookies["accessToken"]
 
       if (!accessToken) {
-        return res.status(498).json({ error: errors.no_access_token })
+        res.status(498).json({ error: errors.no_access_token })
+        return res.end()
+        
       }
 
       return jwt.verify(
@@ -17,12 +18,12 @@ const withAuth =
         async (err, decoded) => {
           if (err) {
             res.status(498).json({ error: errors.jwt_verification_error })
-            return reject()
+            return res.end()
           }
           req.user = decoded as RequestUser
-          return resolve(handler(req, res) as Promise<any>)
+          return handler(req, res) as Promise<any>
         }
       )
-    })
+    }
 
 export default withAuth

@@ -1,5 +1,5 @@
 import axios from "axios"
-import log from "../utils/logger"
+import log from "utils/logger"
 import dayjs from "dayjs"
 
 const url = process.env.PAYPAL_URL as string
@@ -59,19 +59,21 @@ export const createOrder = async (orderData: PaypalOrderData) => {
         Authorization: `Bearer ${accessToken}`,
       },
     })
-
     return res.data
   } catch (err: any) {
+    log.error("CREATE ORDER ERROR: ", err)
     throw new Error(err)
   }
 }
 
-export const capturePayment = async (orderID: string) => {
+export const capturePayment = async (
+  orderID: string
+): Promise<PaypalCaptureResponse> => {
   const paypalOrdersCaptureUrl = `${url}/v2/checkout/orders/${orderID}/capture`
 
   try {
     const accessToken = await generatePaypalAccessToken()
-    const res = await axios.post(
+    const res = await axios.post<PaypalCaptureResponse>(
       paypalOrdersCaptureUrl,
       {},
       {
@@ -87,26 +89,37 @@ export const capturePayment = async (orderID: string) => {
   }
 }
 
-export const getPaypalOrderData = (currency: string) => {
+export const getPaypalOrderData = (
+  invoiceID: string,
+  currency: string = "USD"
+): PaypalOrderData => {
   return {
     intent: "CAPTURE",
     purchase_units: [
       {
+        invoice_id: invoiceID,
         items: [
           {
-            name: "One Year Subscription",
-            description:
-              "365 days of unlimited access to all our digital assets",
+            name: "One year Subscription",
+            description: "365 days of unlimited access to iso201",
             quantity: "1",
             unit_amount: {
               currency_code: currency,
               value: "60.00",
             },
           },
+          {
+            name: "Processing Fee",
+            quantity: "1",
+            unit_amount: {
+              currency_code: currency,
+              value: "10.00"
+            }
+          }
         ],
         amount: {
           currency_code: currency,
-          value: "30.00",
+          value: "40.00",
           breakdown: {
             discount: {
               currency_code: currency,
@@ -114,7 +127,7 @@ export const getPaypalOrderData = (currency: string) => {
             },
             item_total: {
               currency_code: currency,
-              value: "60.00",
+              value: "70.00",
             },
           },
         },

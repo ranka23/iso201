@@ -24,3 +24,7 @@ a {
 * {
   box-sizing: border-box;
 }
+
+iframe:focus-visible {
+  outline: none;
+}

@@ -11,7 +11,6 @@ const instance = axios.create({
 })
 
 const refreshAuth = async () => {
-  console.log("AUTH REFRESH CALLED")
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_API_ENDPOINT}/auth/refresh`

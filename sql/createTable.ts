@@ -13,7 +13,7 @@ CREATE TABLE public.users
     modified timestamp with time zone,
     deleted timestamp with time zone,
     PRIMARY KEY (id, email),
-    CONSTRAINT unique_id UNIQUE (id)
+    CONSTRAINT unique_user_id UNIQUE (id)
         INCLUDE(id),
     CONSTRAINT unique_email UNIQUE (email)
         INCLUDE(email)
@@ -57,17 +57,10 @@ CREATE TABLE public.subscriptions
     total real NOT NULL,
     modified timestamp with time zone,
     PRIMARY KEY (id, invoiceid, userid),
-    CONSTRAINT unqiue_id UNIQUE (id)
+    CONSTRAINT unique_subscription_id UNIQUE (id)
         INCLUDE(id),
-    CONSTRAINT unique_userid UNIQUE (userid)
-        INCLUDE(userid),
     CONSTRAINT unique_invoiceid UNIQUE (invoiceid)
         INCLUDE(invoiceid),
-    CONSTRAINT foreign_userid FOREIGN KEY (userid)
-        REFERENCES public.users (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
     CONSTRAINT foreign_invoiceid FOREIGN KEY (invoiceid)
         REFERENCES public.payment_status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -76,5 +69,38 @@ CREATE TABLE public.subscriptions
 );
 
 ALTER TABLE IF EXISTS public.subscriptions
+    OWNER to postgres;
+`
+
+export const createPaypalPaymentsTable = `
+CREATE TABLE public.paypal_payments
+(
+    id text NOT NULL,
+    status text NOT NULL,
+    email text NOT NULL,
+    accountid text NOT NULL,
+    firstname text NOT NULL,
+    lastname text NOT NULL,
+    address text,
+    currency text NOT NULL,
+    gross real NOT NULL,
+    paypalfee real NOT NULL,
+    total real NOT NULL,
+    invoiceid text NOT NULL,
+    created text NOT NULL,
+    payer text NOT NULL,
+    PRIMARY KEY (id, invoiceid),
+    CONSTRAINT unique_paypal_id UNIQUE (id)
+        INCLUDE(id),
+    CONSTRAINT unique_subscription_invoiceid UNIQUE (invoiceid)
+        INCLUDE(invoiceid),
+    CONSTRAINT invoiceid FOREIGN KEY (invoiceid)
+        REFERENCES public.subscriptions (invoiceid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE IF EXISTS public.paypal_payments
     OWNER to postgres;
 `

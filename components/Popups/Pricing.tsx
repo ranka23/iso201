@@ -11,9 +11,9 @@ const Pricing = () => {
         <div>
           <div className="text-6xl font-black flex items-top justify-center mr-3">
             <span className="text-3xl">$</span>
-            <span>60</span>
+            <span>5</span>
           </div>
-          <p className="text-2xl font-bold text-center mb-6">per year</p>
+          <p className="text-2xl font-bold text-center mb-6">a month</p>
           {points.map((point) => (
             <div key={point} className="flex items-center mb-2">
               <Icon src={check} height={16} />
@@ -28,29 +28,31 @@ const Pricing = () => {
 
           <div className="flex justify-center items-end">
             <div className="flex items-top justify-center mr-1">
-              <span className="text-md font-black">$</span>
-              <span className="text-2xl font-black line-through">60</span>
+              <span className="text-2xl font-black line-through">$5</span>
             </div>
             <div className="flex items-end mr-3">
               <div className="flex items-top justify-center">
                 <span className="text-xl font-black">$</span>
-                <span className="text-4xl font-black">30</span>
+                <span className="text-4xl font-black">2.5</span>
               </div>
               <p className="text-md font-black content-end text-center ml-1">
-                / yr
+                / mo
               </p>
             </div>
           </div>
         </div>
         <button className="my-3 py-3 font-bold text-centyer bg-black text-white rounded-full hover:opacity-90 transition-opacity">
-          Subscribe for $30
+          Subscribe for $2.50
         </button>
         <p className=" text-xs text-center">
           * Only usage rights are granted. Re-sale or distribution of assets will
           lead to legal action.
         </p>
-        <p className=" text-xs text-center">
-          ** Price not inclusive of taxes and processing charges
+        <p className=" text-xs text-center mt-2">
+          * Price not inclusive of processing charges
+        </p>
+        <p className=" text-xs text-center mt-2">
+        * Charged on an annual basis.
         </p>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { IS_DISCOUNT, IS_TAX } from "constants/"
 import { select, insert, update } from "sql/common"
 import User from "./User"
 import { pg } from "../services"
+import { createPaypalPaymentsEntry } from "../utils/createPaypalPaymentsEntry"
 
 export default class Subscription {
   id?: number
@@ -40,7 +41,7 @@ export default class Subscription {
     this.modified = modified
   }
 
-  async create() {
+  async create(paypalValues?: Array<string | number>) {
     const queryItems = ["invoiceid", "userid", "provider", "price", "total"]
     const createSubscriptionValues = [
       this.invoiceid,
@@ -71,23 +72,34 @@ export default class Subscription {
     const client = await pg().connect()
 
     try {
+      // Start the transaction
       await client.query("BEGIN")
+      // Add entry to Subscription
       await client.query<Subscription>(
         createSubscriptionQuery,
         createSubscriptionValues
       )
-      const { rows } = await client.query(updateUsersQuery, updateUsersValues)
+      // if it's paypal payment add entry to paypal_payments table
+      if (paypalValues) {
+        await createPaypalPaymentsEntry(client, paypalValues)
+      }
+      // Update payment_status table column "status" to 'complete'
       await client.query<User>(
         updatePaymentStatusQuery,
         updatePaymentStatusValues
       )
+      // Update users table column "pro" to true
+      const { rows } = await client.query(updateUsersQuery, updateUsersValues)
+      // Commit the transaction if everything is successful
       await client.query("COMMIT")
-      console.log("ROWS", rows)
+      // Return user's email to confirm the transaction succeeded
       return rows[0].email
     } catch (err: any) {
+      // Rollback all changes if there was error in any of the entries
       await client.query("ROLLBACK")
       throw new Error(err)
     } finally {
+      // Release the client after the transaction completes
       client.release()
     }
   }
@@ -95,6 +107,19 @@ export default class Subscription {
   async read() {
     const query = select("subscriptions", "userid")
     const values = [this.userid]
+    try {
+      const {
+        rows: [subscriptions],
+      } = await pg().query<Subscription>(query, values)
+      return subscriptions
+    } catch (err: any) {
+      throw new Error(err)
+    }
+  }
+
+  static async readWithId(userId: number) {
+    const query = select("subscriptions", "userid")
+    const values = [userId]
     try {
       const {
         rows: [subscriptions],

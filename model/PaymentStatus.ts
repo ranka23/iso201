@@ -55,9 +55,9 @@ export default class PaymentStatus {
     }
   }
 
-  async read(): Promise<PaymentStatus> {
-    const query = select("payment_status", "id")
-    const value = [this.id]
+  async read(from: string = "id"): Promise<PaymentStatus> {
+    const query = select("payment_status", from)
+    const value = [from === "id" ? this.id : this.token]
     try {
       const {
         rows: [payment_status],
