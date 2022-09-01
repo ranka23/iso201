@@ -1,12 +1,12 @@
-const Spinner = () => (
-  <div className="flex justify-center items-center">
+const Loader = ({ color = "black" }) => (
+  <div>
     <div
-      className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0"
-      role="status"
-    >
-      <span className="visually-hidden">Loading...</span>
-    </div>
+      style={{ borderTopColor: "transparent" }}
+      className={`w-8 h-8 border-4 border-${
+        color === "black" ? "black" : "white"
+      } border-solid rounded-full animate-spin`}
+    />
   </div>
 )
 
-export default Spinner
+export default Loader

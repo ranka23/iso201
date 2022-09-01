@@ -1,80 +1,126 @@
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"
-import { OnApproveData } from "@paypal/paypal-js/types/components/buttons"
-import { post, get } from "services/call"
-import { useCallback, useState } from "react"
-import axios from "services/call"
-import { QRCode } from "components/QRCode/QRCode"
+import { PayPalScriptProvider } from "@paypal/react-paypal-js"
+import Paypal from "components/pages/Subscribe/Paypal/Paypal"
+import Solana from "components/pages/Subscribe/Solana/Solana"
+import { NextPageContext } from "next"
+import { FormEvent, useCallback, useState } from "react"
+import { isUserPro } from "services/jwt"
+import MountUnMount from "widgets/Animated/MountUnMount"
+import GoBack from "../components/pages/Subscribe/GoBack"
+import PriceAndInfo from "../components/pages/Subscribe/PriceAndInfo"
+import ProviderSelect from "../components/pages/Subscribe/ProviderSelect"
+import { parseCookies } from "../utils/cookies"
 
-const Subscribe: React.FC = () => {
-  const [reference, setReference] = useState({
-    qr: "",
-    invoiceID: "",
-  })
-  const paypalInitialOptions = {
-    "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID as string,
-    currency: "USD",
-  }
+const paypalInitialOptions = {
+  "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID as string,
+  currency: "USD",
+}
+
+interface Props {
+  price: number
+  discountCaption: string
+  description: Array<string>
+}
+
+const Subscribe: React.FC<Props> = ({
+  price,
+  discountCaption,
+  description,
+}) => {
+  const [provider, setProvider] = useState<PaymentProvider>("solana")
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
-  const [error, setError] = useState("")
-
-  const onCreateSolanaOrder = useCallback(async () => {
-    try {
-      const res = await axios.get<{
-        qr: string
-        invoiceID: string
-        reference: string
-      }>(`/subscriptions/solana/create`, {})
-      setReference(res.data)
-    } catch (error: any) {
-      setError(error)
+  const [amount, setAmount] = useState({
+    price,
+    currency: "$",
+  })
+  const handleProviderChange = useCallback((e: FormEvent<HTMLInputElement>) => {
+    if (e) {
+      const { value } = e.currentTarget
+      setProvider(value as PaymentProvider)
     }
   }, [])
 
-  const onCreatePaypalOrder = async () => {
-    const response = await get<{ id: string }>("/subscriptions/paypal/create")
-    console.log("Response:", response.data)
-    return response.data.id
-  }
-
-  const onVerifyPaypalOrder = async (data: OnApproveData) => {
-    const response = await get<{ id: string }>(
-      `/subscriptions/paypal/${data.orderID}/complete`
-    )
-    console.log("Response:", response.data)
-  }
-
-  const onVerifySolanaOrder = useCallback(async () => {
-    try {
-      const response = await get<{ message: string }>(
-        `/subscriptions/solana/${reference.invoiceID}/complete`
-      )
-      if (response.data.message == "success") {
-        setIsPaymentSuccess(true)
-      }
-    } catch (error: any) {
-      setError(error.toString())
-    }
-  }, [reference])
-
   return (
-    <>
-      <PayPalScriptProvider options={paypalInitialOptions}>
-        <PayPalButtons
-          onApprove={onVerifyPaypalOrder}
-          createOrder={onCreatePaypalOrder}
-        />
-      </PayPalScriptProvider>
-      {reference.qr ? (
-        <>
-          <QRCode url={reference.qr} />
-          <button onClick={onVerifySolanaOrder}>Verify Payment</button>
-        </>
-      ) : (
-        <button onClick={onCreateSolanaOrder}>Pay with Solana</button>
-      )}
-      {isPaymentSuccess ? <h2>Success</h2> : null}
-      {error ? <h2>{error.toString()}</h2> : null}
-    </>
+    <PayPalScriptProvider options={paypalInitialOptions}>
+      <div className="md:flex w-100%">
+        <div className="bg-black md:w-[50%] md:min-h-screen pl-4 pt-12 text-white">
+          <div className="max-w-[70%] m-auto">
+            <GoBack />
+            <div className="py-12">
+              <PriceAndInfo
+                discountCaption={discountCaption}
+                description={description}
+                amount={amount}
+                provider={provider}
+              />
+              <ProviderSelect
+                onChange={handleProviderChange}
+                provider={provider}
+                disabled={isPaymentSuccess}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white md:w-[50%] pr-4 md:min-h-screen pt-12">
+          <div className="m-auto w-[80%] max-w-[420px]">
+            <MountUnMount isVisible={provider === "paypal"}>
+              <Paypal
+                isSuccess={isPaymentSuccess}
+                setAmount={setAmount}
+                onSuccess={setIsPaymentSuccess}
+              />
+            </MountUnMount>
+            <MountUnMount isVisible={provider === "solana"}>
+              <Solana
+                isSuccess={isPaymentSuccess}
+                onSuccess={setIsPaymentSuccess}
+              />
+            </MountUnMount>
+          </div>
+        </div>
+      </div>
+    </PayPalScriptProvider>
   )
 }
+
+export const getServerSideProps = async (context: NextPageContext) => {
+  const { req } = context
+  const cookies = parseCookies(req?.headers?.cookie || "")
+  const accessToken = cookies?.accessToken
+  const goBackToHomePage = {
+    redirect: {
+      destination: "/",
+      permanent: false,
+    },
+  }
+
+  const description = [
+    "Unlimited downloads",
+    "4K and HD Videos",
+    "High-res Images",
+    "Complete usage rights",
+    "For Youtube channel",
+    "For social media accounts",
+    "For designs, ads or marketing",
+  ]
+
+  const props = {
+    props: {
+      price: 30,
+      discountCaption: "50% early bird discount",
+      description,
+    },
+  }
+
+  if (!accessToken) {
+    return goBackToHomePage
+  }
+
+  const isPro = await isUserPro(accessToken)
+
+  if (!isPro) {
+    return props
+  }
+  return goBackToHomePage
+}
+
 export default Subscribe

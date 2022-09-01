@@ -14,7 +14,10 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "paths": {
+      "widgets/*": ["./components/widgets/*"],
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/subscriptions/solana/[invoiceID]"],
   "exclude": ["node_modules"]

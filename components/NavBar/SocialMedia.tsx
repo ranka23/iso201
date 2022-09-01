@@ -1,4 +1,4 @@
-import Icon from "../widgets/Icon/Icon"
+import Icon from "widgets/Icon/Icon"
 import facebook from "public/icons/facebook.svg"
 import youtube from "public/icons/youtube.svg"
 import instagram from "public/icons/instagram.svg"

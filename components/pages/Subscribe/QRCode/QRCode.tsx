@@ -5,11 +5,11 @@ import { useEffect, useMemo, useRef, useState } from "react"
 export const QRCode = ({ url }: { url: string }) => {
   const [size, setSize] = useState(() =>
     typeof window === "undefined"
-      ? 400
-      : Math.min(window.screen.availWidth - 48, 400)
+      ? 420
+      : Math.min(window.screen.availWidth - 48, 420)
   )
   useEffect(() => {
-    const listener = () => setSize(Math.min(window.screen.availWidth - 48, 400))
+    const listener = () => setSize(Math.min(window.screen.availWidth - 48, 420))
 
     window.addEventListener("resize", listener)
     return () => window.removeEventListener("resize", listener)

@@ -9,6 +9,7 @@ body {
   font-family: 'Ubuntu', sans-serif;
   color: #333;
   font-size: 14px;
+  overflow-x: hidden;
 }
 
 input {
@@ -27,4 +28,8 @@ a {
 
 iframe:focus-visible {
   outline: none;
+}
+
+input {
+  accent-color: #333333;
 }

@@ -87,7 +87,6 @@ export const validateSolanaTransaction = async (
   }
   try {
     const validation = await validateTransfer(sol(), signature, details)
-    console.log("VALIDATION SUCCESSFUL")
     return validation
   } catch (error: any) {
     throw new Error(error)

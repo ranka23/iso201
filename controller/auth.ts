@@ -75,7 +75,6 @@ export const refreshAuthToken = async (
 ) => {
   const refreshToken = req.cookies["refreshToken"] as string
   if (!refreshToken) {
-    console.log("No refresh token", refreshToken)
     return res
       .status(308)
       .redirect(

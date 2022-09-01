@@ -1,9 +1,7 @@
 import jwt from "jsonwebtoken"
 import log from "utils/logger"
 import { NextApiResponse } from "next"
-import { NextResponse } from "next/server"
 import { CookieSerializeOptions } from "next/dist/server/web/types"
-import { setCookie } from "../utils/setCookie"
 import { serialize } from "cookie"
 
 export const signToken = (
@@ -39,6 +37,27 @@ export const verifyRefreshToken = (refreshToken: string): Promise<number> =>
         if (userId) {
           resolve(userId)
         }
+      }
+    )
+  })
+
+export const isUserPro = (accessToken: string): Promise<boolean> =>
+  new Promise<boolean>((resolve) => {
+    jwt.verify(
+      accessToken,
+      process.env.JWT_ACCESS_TOKEN_SECRET as string,
+      (error, payload: any) => {
+        if (payload) {
+          if (payload.pro) {
+            return resolve(true)
+          }
+        } else if (error?.name === "TokenExpiredError") {
+          const decode: any = jwt.decode(accessToken)
+          if (decode?.pro) {
+            return resolve(true)
+          }
+        }
+        return resolve(false)
       }
     )
   })
@@ -90,9 +109,9 @@ export const signAndSetJWTTokens = async (
 }
 
 export const clearAuthCookies = (response: NextApiResponse) => {
-  const res = NextResponse.next()
-
-  res.cookies.delete("accessToken")
-  res.cookies.delete("refreshToken")
+  response.setHeader("Set-Cookie", [
+    `accessToken=deleted; Max-Age=0`,
+    `refreshToken=deleted; Max-Age=0`,
+  ])
   return response.status(403).redirect("/")
 }

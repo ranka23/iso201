@@ -1,4 +1,4 @@
-import Icon from "../widgets/Icon/Icon"
+import Icon from "widgets/Icon/Icon"
 import search from 'public/icons/search.svg'
 
 const Search = () => {

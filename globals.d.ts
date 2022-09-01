@@ -32,30 +32,33 @@ interface PaypalOrderItem {
 }
 
 interface PaypalOrderData {
-  intent: string
-  purchase_units: [
-    {
-      invoice_id: invoiceID
-      items: Array<PaypalOrderItem>
-      amount: {
-        currency_code: string
-        value: string
-        breakdown: {
-          discount: {
-            currency_code: string
-            value: string
-          }
-          item_total: {
-            currency_code: string
-            value: string
+  total: number
+  orderDetails: {
+    intent: string
+    purchase_units: [
+      {
+        invoice_id: invoiceID
+        items: Array<PaypalOrderItem>
+        amount: {
+          currency_code: string
+          value: string
+          breakdown: {
+            discount?: {
+              currency_code: string
+              value: string
+            }
+            item_total: {
+              currency_code: string
+              value: string
+            }
           }
         }
       }
+    ]
+    application_context: {
+      brand_name: string
+      shipping_preference: string
     }
-  ]
-  application_context: {
-    brand_name: string
-    shipping_preference: string
   }
 }
 
@@ -137,3 +140,44 @@ interface PaypalCaptureResponse {
     }
   ]
 }
+
+interface CreateSolanaOrderResponse {
+  qr: string
+  invoiceID: string
+}
+
+interface CreatePaypalOrderResponse {
+  id: string
+  invoiceID: string
+  amount: string
+  currency: AvailableCurrencies
+}
+
+interface ErrorResponse {
+  error: {
+    code: string
+    message: string
+  }
+}
+
+interface SuccessResponse {
+  success: boolean
+}
+
+type AvailableCurrencies =
+  | "USD"
+  | "AUD"
+  | "CAD"
+  | "CHF"
+  | "DKK"
+  | "EUR"
+  | "GBP"
+  | "JPY"
+  | "NOK"
+  | "NZD"
+  | "SEK"
+  | "SGD"
+  | "THB"
+  | "MXN"
+  | "ILS"
+  | "HKD"

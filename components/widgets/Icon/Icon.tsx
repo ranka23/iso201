@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { MouseEventHandler } from "react"
 
 interface IconProps {
   name?: string
@@ -7,9 +8,18 @@ interface IconProps {
   layout?: "fixed" | "fill" | "intrinsic" | "responsive" | undefined
   className?: string
   src?: any
+  onClick?: MouseEventHandler<HTMLImageElement>
 }
 
-const Icon = ({ name = "an", width, height, layout, className, src }: IconProps) => (
+const Icon = ({
+  name = "",
+  width,
+  height,
+  layout,
+  className,
+  src,
+  onClick,
+}: IconProps) => (
   <div
     className={
       width || height
@@ -24,6 +34,7 @@ const Icon = ({ name = "an", width, height, layout, className, src }: IconProps)
       height={height}
       layout={layout}
       objectFit="contain"
+      onClick={onClick}
     />
   </div>
 )

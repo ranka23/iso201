@@ -35,7 +35,7 @@ const getGoogleOAuthTokens = async ({
     )
     return res.data
   } catch (error: any) {
-    console.log("Failed to fetch Google Oauth", error)
+    //TODO: Front-end error logging
     throw new Error(error.message)
   }
 }

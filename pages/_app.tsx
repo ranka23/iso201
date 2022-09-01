@@ -1,10 +1,21 @@
 import "styles/globals.css"
 import type { AppProps } from "next/app"
-import NavBar from "components/NavBar/NavBar"
+import NavBar from "components/NavBar"
 import Footer from "components/Footer/Footer"
 import Head from "next/head"
+import { useRouter } from "next/router"
+import { useMemo } from "react"
+import ErrorHandler from "components/Error"
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { route } = useRouter()
+
+  const showRoute = useMemo(() => {
+    if (["subscribe", "404", "500"].some((value) => route.includes(value))) {
+      return false
+    }
+    return true
+  }, [route])
   return (
     <>
       <Head>
@@ -14,8 +25,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Stock videos for YouTube Channel, Instagram, TikTok, Facebook and more"
         />
       </Head>
-      <NavBar />
-      <Component {...pageProps} />
+      {showRoute ? <NavBar /> : null}
+      <ErrorHandler>
+        <Component {...pageProps} />
+      </ErrorHandler>
       <Footer />
     </>
   )

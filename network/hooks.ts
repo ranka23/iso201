@@ -1,9 +1,5 @@
 import useSWR, { SWRConfiguration } from "swr"
 import {
-  completePaypalOrder,
-  completeSolanaOrder,
-  createPaypalOrder,
-  createSolanaOrder,
   getTest,
   getTestProtected,
 } from "./fetchers/query"
@@ -13,7 +9,7 @@ const useSWRBuilder = <T>(
   fetcher: (...values: any) => Promise<T>,
   config?: SWRConfiguration
 ) => {
-  const { data, error, isValidating, mutate } = useSWR(key, fetcher, config)
+  const { data, error, isValidating, mutate } = useSWR<T>(key, fetcher, config)
 
   return {
     data,
@@ -22,44 +18,6 @@ const useSWRBuilder = <T>(
     isValidating,
     mutate,
   }
-}
-
-export const useCreatePaypalOrder = (config?: SWRConfiguration) => {
-  return useSWRBuilder(
-    "/subscriptions/paypal/create",
-    createPaypalOrder,
-    config
-  )
-}
-
-export const useCompletePaypalOrder = (
-  invoiceID: string,
-  config?: SWRConfiguration
-) => {
-  return useSWRBuilder(
-    [`/subscriptions/paypal/${invoiceID}/complete`],
-    completePaypalOrder,
-    config
-  )
-}
-
-export const useCreateSolanaOrder = (config?: SWRConfiguration) => {
-  return useSWRBuilder(
-    `/subscriptions/solana/create`,
-    createSolanaOrder,
-    config
-  )
-}
-
-export const useCompleteSolanaOrder = (
-  invoiceID: string,
-  config?: SWRConfiguration
-) => {
-  return useSWRBuilder(
-    [`/subscriptions/solana/${invoiceID}/complete`],
-    completeSolanaOrder,
-    config
-  )
 }
 
 export const useTest = (config?: SWRConfiguration) => {

@@ -1,5 +1,5 @@
 import { NextApiResponse } from "next"
-import { serialize, CookieSerializeOptions } from 'cookie'
+import { serialize, CookieSerializeOptions, parse } from 'cookie'
 
 export const setCookie = (
   res: NextApiResponse,
@@ -15,4 +15,8 @@ export const setCookie = (
   }
 
   res.setHeader('Set-Cookie', serialize(name, stringValue, options))
+}
+
+export const parseCookies = (cookie: string) => {
+  return parse(cookie);
 }

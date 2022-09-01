@@ -16,7 +16,7 @@ const errors = {
   unverified_payment: {
     code: "unverified_purchase",
     message:
-      "Unable to verify your payment success status. If the amount has been deducted on your end, please reach out to us via email at payments@iso201.com",
+      "Unable to verify your payment status. If the amount has been deducted on your end, please reach out to us via email at payments@iso201.com",
   },
   failed_to_place_order: {
     code: "failed_to_place_order",
@@ -49,8 +49,16 @@ const errors = {
     message: "Route not found."
   },
   invoiceID_not_provided: {
-    conde: "invoiceID_not_provided",
+    code: "invoiceID_not_provided",
     message: "Cannot proceed with an invoice ID"
+  },
+  currency_not_provided: {
+    code: "currency_not_provided",
+    message: "Cannot proceed without currency"
+  },
+  currency_not_available: {
+    code: "currency_not_available",
+    message: "Provided currency is not available"
   }
 }
 

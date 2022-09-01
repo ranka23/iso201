@@ -1,9 +1,9 @@
-import Icon from "../widgets/Icon/Icon"
+import Icon from "widgets/Icon/Icon"
 import check from "public/icons/check.svg"
 
 const Pricing = () => {
   return (
-    <div className="w-80 rounded-2xl shadow-md overflow-hidden">
+    <div className="w-80 rounded-2xl shadow-md overflow-hidden bg-white">
       <p className="bg-black text-center text-2xl font-bold text-white py-3">
         Pro
       </p>
@@ -41,7 +41,7 @@ const Pricing = () => {
             </div>
           </div>
         </div>
-        <button className="my-3 py-3 font-bold text-centyer bg-black text-white rounded-full hover:opacity-90 transition-opacity">
+        <button className="my-3 py-3 font-bold text-center bg-black text-white rounded-full hover:opacity-90 transition-opacity">
           Subscribe for $2.50
         </button>
         <p className=" text-xs text-center">
@@ -65,8 +65,6 @@ const points = [
   "Unlimited downloads",
   "4K & HD videos",
   "High-res images",
-  "Hi-res audio clips",
-  "Fullscreen access",
   "For YouTube & social media",
   "For advertising & marketing",
 ]

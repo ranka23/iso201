@@ -33,8 +33,12 @@ export const get = async <T>(
   queryParams?: Record<string, string>,
   options?: AxiosRequestConfig
 ) => {
-  const params = new URLSearchParams(queryParams).toString()
-  return instance.get<T>(`${url}?${params}`, options)
+  const params = new URLSearchParams(queryParams)
+  let endpoint = url
+  if (params) {
+    endpoint += `?${params.toString()}`
+  }
+  return instance.get<T>(endpoint, options)
 }
 
 export const post = async <T>(

@@ -20,31 +20,64 @@ import errors from "constants/errors"
 import Subscription from "model/Subscription"
 import { signAndSetJWTTokens } from "services/jwt"
 import { extractPaypalPaymentsValue } from "utils/createPaypalPaymentsEntry"
+import convertCurrency, {
+  checkCurrencyIsAvailableCurrency,
+} from "../utils/convertCurrency"
 
 export const createPaypalOrder = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const { id, pro } = req.user
+  const { currency } = req.query
+  const { id: userID, pro } = req.user
+
+  if (!currency) {
+    return res.status(401).json({ error: errors.currency_not_provided })
+  }
 
   if (pro) {
     return res.status(401).json({ error: errors.already_pro })
   }
 
+  if (!checkCurrencyIsAvailableCurrency(currency as AvailableCurrencies)) {
+    return res.status(401).json({ error: errors.currency_not_provided })
+  }
+
   const invoiceID = nanoid()
   try {
-    const order: { id: string } = await createOrder(
-      getPaypalOrderData(invoiceID)
+    // Get the subscription amount and add processing fee
+    let amount: string = (
+      getSubscriptionAmount().finalPrice + (getSubscriptionAmount()?.processingFee || 0)
+    ).toFixed(2)
+    if (currency !== "USD") {
+      const response = await convertCurrency(
+        amount,
+        currency as AvailableCurrencies
+      )
+      amount = response.data?.rates?.[currency as string].rate
+    }
+    const paypalOrderDetails = getPaypalOrderData(
+      invoiceID,
+      currency as AvailableCurrencies,
+      parseFloat(parseFloat(amount).toFixed(2))
+    )
+    const { id }: { id: string } = await createOrder(
+      paypalOrderDetails.orderDetails
     )
     const paymentStatus = await new PaymentStatus(
       invoiceID,
       "pending",
-      id,
+      userID,
       "paypal",
-      order.id
+      id
     ).create()
     if (paymentStatus.id === invoiceID) {
-      return res.status(200).json({ order, invoiceID })
+      return res.status(200).json({
+        id,
+        invoiceID,
+        amount: paypalOrderDetails.total,
+        currency: currency || "USD",
+      })
     } else {
       return res.status(500).json({ error: errors.failed_to_place_order })
     }
@@ -99,7 +132,7 @@ export const completePaypalOrder = async (
             email: userEmail,
             pro: true,
           })
-          return res.status(200).json({ message: "success" })
+          return res.status(200).json({ success: true })
         } else {
           return res
             .status(500)
@@ -200,7 +233,7 @@ export const completeSolanaOrder = async (
             email: userEmail,
             pro: true,
           })
-          return res.status(200).json({ message: "success" })
+          return res.status(200).json({ success: true })
         } else {
           return res
             .status(500)
