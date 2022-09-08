@@ -12,6 +12,11 @@ body {
   overflow-x: hidden;
 }
 
+
+.plyr__controls .videoThumbnail {
+  display: none;
+}
+
 input {
   font-family: 'Ubuntu', sans-serif;
   color: #333;

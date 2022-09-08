@@ -27,8 +27,9 @@ const PriceAndInfo: React.FC<Props> = ({
           <span className="text-4xl mt-1 mr-1">{amount.currency}</span>
           <span>
             {provider === "paypal" && amount.currency === "$"
-              ? `${10 + amount.price} only`
-              : amount.price}
+              ? `${10 + amount.price}`
+              : amount.price}{" "}
+            {amount.currency === "$" ? "only" : ""}
           </span>
         </div>
         {discountCaption ? (

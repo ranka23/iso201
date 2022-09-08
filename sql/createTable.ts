@@ -104,3 +104,32 @@ CREATE TABLE public.paypal_payments
 ALTER TABLE IF EXISTS public.paypal_payments
     OWNER to postgres;
 `
+
+export const createAssetTable = `
+CREATE TABLE public.asset
+(
+    id serial NOT NULL,
+    title text NOT NULL,
+    fname text NOT NULL,
+    type asset_type NOT NULL,
+    likes integer NOT NULL DEFAULT 0,
+    views integer NOT NULL DEFAULT 0,
+    tags text[] NOT NULL,
+    size bigint NOT NULL,
+    length integer NOT NULL,
+    storage text NOT NULL,
+    orientation asset_orientation NOT NULL,
+    created timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified timestamp with time zone,
+    related integer[],
+    thumbnail text,
+    PRIMARY KEY (id, storage),
+    CONSTRAINT unique_asset_id UNIQUE (id)
+        INCLUDE(id),
+    CONSTRAINT unique_asset_storage UNIQUE (storage)
+        INCLUDE(storage)
+);
+
+ALTER TABLE IF EXISTS public.asset
+    OWNER to postgres;
+`

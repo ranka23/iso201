@@ -30,9 +30,11 @@ const LoginSubscribe = () => {
         <span className="mr-0.5 relative">Pricing</span>
         <Icon className="-rotate-90" src={chevron} />
       </span>
-      <a href={getGoogleOAuthURL()} className={className}>
-        Login
-      </a>
+      <Link href={'/login'}>
+        <a className={className}>
+          Login
+        </a>
+      </Link>
       <span className="px-3 opacity-60">/</span>
       <Link href="/subscribe">
         <a className={className}>Subscribe</a>

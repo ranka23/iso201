@@ -111,6 +111,8 @@ export const getServerSideProps = async (context: NextPageContext) => {
     },
   }
 
+  return props
+
   if (!accessToken) {
     return goBackToHomePage
   }

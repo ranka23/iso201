@@ -25,8 +25,4 @@ const links = [
     name: "Images",
     href: "/images",
   },
-  {
-    name: "Audio",
-    href: "/audio",
-  },
 ]

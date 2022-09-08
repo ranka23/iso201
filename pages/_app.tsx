@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Content for Creators - iso201</title>
+        <title>4K and HD Videos | iso201</title>
         <meta
           name="description"
           content="Stock videos for YouTube Channel, Instagram, TikTok, Facebook and more"
