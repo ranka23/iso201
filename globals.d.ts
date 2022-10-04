@@ -181,3 +181,23 @@ type AvailableCurrencies =
   | "MXN"
   | "ILS"
   | "HKD"
+
+interface VideoEntry {
+  id?: number
+  title?: string
+  fname?: string
+  type?: AssetType
+  size?: number
+  tags?: Array<string>
+  mime?: string
+  scale?: [number, number]
+  duration?: number
+  fps?: number
+  bitrate?: number
+  location?: string
+}
+
+interface ErrorRes {
+  code: string
+  message: string
+}

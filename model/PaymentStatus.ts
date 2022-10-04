@@ -1,4 +1,3 @@
-import { Pool } from "pg"
 import { insert, select } from "sql/common"
 import { update } from "sql/common"
 import { pg } from "services"

@@ -136,7 +136,7 @@ export const completePaypalOrder = async (
         } else {
           return res
             .status(500)
-            .json({ error: errors.payment_received_but_not_pro_error })
+            .json({  error: errors.payment_received_but_not_pro_error })
         }
       }
     }

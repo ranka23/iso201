@@ -46,20 +46,72 @@ const errors = {
   },
   route_not_found: {
     code: "route_not_found",
-    message: "Route not found."
+    message: "Route not found.",
   },
   invoiceID_not_provided: {
     code: "invoiceID_not_provided",
-    message: "Cannot proceed with an invoice ID"
+    message: "Cannot proceed with an invoice ID",
   },
   currency_not_provided: {
     code: "currency_not_provided",
-    message: "Cannot proceed without currency"
+    message: "Cannot proceed without currency",
   },
   currency_not_available: {
     code: "currency_not_available",
-    message: "Provided currency is not available"
-  }
+    message: "Provided currency is not available",
+  },
+  failed_to_save_video_entry_in_db: {
+    code: "failed_to_save_video_entry_in_db",
+    message: "Failed to save video entry in Database.",
+  },
+  video_details_required: {
+    code: "video_details_required",
+    message: "Video details required",
+  },
+  bitrate_required: {
+    code: "bitrate_required",
+    message: "Bit rate required",
+  },
+  duration_required: {
+    code: "duration_required",
+    message: "Duration required",
+  },
+  file_name_required: {
+    code: "file_name_required",
+    message: "File name required",
+  },
+  fps_required: {
+    code: "fps_required",
+    message: "FPS required",
+  },
+  file_type_mime_required: {
+    code: "file_type_mime_required",
+    message: "File Type MIME required",
+  },
+  file_size_required: {
+    code: "file_size_required",
+    message: "File size required",
+  },
+  tags_required: {
+    code: "tags_required",
+    message: "Tags required",
+  },
+  title_required: {
+    code: "title_required",
+    message: "Title required",
+  },
+  type_required: {
+    code: "type_required",
+    message: "File type required",
+  },
+  scale_required: {
+    code: "scale_required",
+    message: "File dimensions required",
+  },
+  request_not_found: {
+    code: "request_not_found",
+    message: "Request not found",
+  },
 }
 
 export default errors

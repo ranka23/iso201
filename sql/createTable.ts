@@ -133,3 +133,40 @@ CREATE TABLE public.asset
 ALTER TABLE IF EXISTS public.asset
     OWNER to postgres;
 `
+
+export const createVideoEntryTable = `
+-- Table: public.video_entry
+
+-- DROP TABLE IF EXISTS public.video_entry;
+
+CREATE TABLE IF NOT EXISTS public.video_entry
+(
+    id integer NOT NULL DEFAULT nextval('video_entry_id_seq'::regclass),
+    title text COLLATE pg_catalog."default" NOT NULL,
+    fname text COLLATE pg_catalog."default" NOT NULL,
+    type asset_type NOT NULL,
+    size integer NOT NULL,
+    tags text[] COLLATE pg_catalog."default" NOT NULL,
+    mime text COLLATE pg_catalog."default" NOT NULL,
+    scale integer[] NOT NULL,
+    duration integer NOT NULL,
+    fps integer,
+    bitrate integer,
+    location text COLLATE pg_catalog."default",
+    uri text COLLATE pg_catalog."default" NOT NULL,
+    thumbnail text COLLATE pg_catalog."default" NOT NULL,
+    rating integer NOT NULL,
+    CONSTRAINT video_entry_pkey PRIMARY KEY (id, uri, thumbnail),
+    CONSTRAINT unique_video_entry_id UNIQUE (id)
+        INCLUDE(id)
+    CONSTRAINT unique_video_entry_uri UNIQUE (uri)
+        INCLUDE(uri)
+    CONSTRAINT unique_video_entry_thumbnail UNIQUE (thumbnail)
+        INCLUDE(thumbnail)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.video_entry
+    OWNER to postgres;
+`
