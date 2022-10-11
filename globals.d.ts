@@ -201,3 +201,24 @@ interface ErrorRes {
   code: string
   message: string
 }
+
+interface GetAssetReq {
+  id: number,
+  title: string,
+  fname: string,
+  type: AssetType,
+  size: number,
+  search: string,
+  tags: Array<string>,
+  mime: string,
+  likes: number,
+  views: number,
+  scale: [number, number],
+  created: string,
+  modified: string,
+  fps: number,
+  bitrate: number,
+  rating: number,
+  provide: Record<string, string>,
+  operator: "AND" | "OR"
+}

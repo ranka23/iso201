@@ -73,7 +73,7 @@ export const validateVideoEntry = (data: VideoEntry = {}): {
     error = errors.title_required
     status = 400
   }
-
+  
   if (!type) {
     error = errors.type_required
     status = 400

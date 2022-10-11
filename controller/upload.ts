@@ -7,8 +7,14 @@ import servErr from "utils/servErr"
 import Asset from "model/Asset"
 
 export const videoEntry = async (req: NextApiRequest, res: NextApiResponse) => {
-  // req.body
-  console.log("VideoEntry Called: ", req.body)
+  const accessKey = process.env.UPLOAD_ASSET_SECRET
+  if (
+    accessKey &&
+    req.headers["accessKey"] &&
+    req.headers["accessKey"]?.toString().trim() !== accessKey.trim()
+  ) {
+    return res.status(403).json({ error: errors.unauthorized_access })
+  }
 
   const {
     title,
@@ -29,13 +35,11 @@ export const videoEntry = async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Validate all the data received
   const { status, error } = validateVideoEntry(req.body)
-
   if (status !== 200) {
     return res.status(status).json({
       error,
     })
   }
-
   try {
     // Take all the data and store it in the video_entry table
     const videoEntry = await new VideoEntry(
@@ -53,7 +57,7 @@ export const videoEntry = async (req: NextApiRequest, res: NextApiResponse) => {
       rating,
       bitrate,
       location
-    )
+    ).create()
 
     if (videoEntry?.id) {
       return res.status(200).json({ message: "success" })
@@ -72,14 +76,16 @@ export const bunnyWebHook = async (
   res: NextApiResponse
 ) => {
   const { VideoGuid, Status } = req.body
+  console.log(`CALLED with STATUS: ${Status} and VideoGuid: ${VideoGuid}`)
 
   if (Status !== 3) {
     return res.status(200)
   }
 
+
   try {
     // Check if the video exists in the VideoEntry table
-    const video = await new VideoEntry(VideoGuid)
+    const video = await new VideoEntry(VideoGuid).read()
 
     if (video) {
       // Add the details to the Assets table
@@ -115,15 +121,25 @@ export const bunnyWebHook = async (
         rating,
         duration,
         location
-      )
+      ).create()
       // return 200 status
+
+
       if (asset) {
-        return res.status(200)
+        return res.status(200).json({ message: "success" })
       } else {
         // TODO:  If the asset wasn't created do something.
+        log.warn(
+          `Asset for uri: ${VideoGuid} was not created inspite receiving the data`
+        )
+        return res.status(200)
       }
     } else {
       // TODO: If the video entry is not found do something.
+      log.warn(
+        `Asset for uri: ${VideoGuid} was not created because video entry was not found for data`
+      )
+      return res.status(200)
     }
   } catch (error: any) {
     log.error("VIDEO ENTRY UPLOAD ERROR: ", error)

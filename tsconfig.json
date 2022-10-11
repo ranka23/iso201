@@ -19,6 +19,6 @@
       "widgets/*": ["./components/widgets/*"],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/subscriptions/solana/[invoiceID]"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/subscriptions/solana/[invoiceID]", "test.js"],
   "exclude": ["node_modules"]
 }

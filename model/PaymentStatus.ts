@@ -68,7 +68,7 @@ export default class PaymentStatus {
   }
 
   async update(): Promise<PaymentStatus> {
-    const query = update("payment_status", ["status"], "id")
+    const query = update("payment_status", "id", ["status"])
     const value = [this.status, this.id]
     try {
       const {

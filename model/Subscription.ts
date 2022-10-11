@@ -64,9 +64,9 @@ export default class Subscription {
       createSubscriptionValues.push(this.address)
     }
     const createSubscriptionQuery = insert("subscriptions", queryItems)
-    const updateUsersQuery = update("users", ["pro"], "id", "email")
+    const updateUsersQuery = update("users", "id", ["pro"], "email")
     const updateUsersValues = [true, this.userid]
-    const updatePaymentStatusQuery = update("payment_status", ["status"], "id")
+    const updatePaymentStatusQuery = update("payment_status", "id", ["status"])
     const updatePaymentStatusValues = ["completed", this.invoiceid]
 
     const client = await pg().connect()

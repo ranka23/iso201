@@ -74,7 +74,7 @@ export default class VideoEntry {
       this.type,
       this.size,
       this.tags,
-      this.mime,
+      this.mime?.toLowerCase(),
       this.scale,
       this.duration,
       this.fps,

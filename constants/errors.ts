@@ -112,6 +112,10 @@ const errors = {
     code: "request_not_found",
     message: "Request not found",
   },
+  unauthorized_access: {
+    code: "request_not_found",
+    message: "Unauthorized access to resource"
+  }
 }
 
 export default errors
