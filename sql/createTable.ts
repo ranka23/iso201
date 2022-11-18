@@ -106,63 +106,83 @@ ALTER TABLE IF EXISTS public.paypal_payments
 `
 
 export const createAssetTable = `
-CREATE TABLE public.asset
+CREATE TABLE IF NOT EXISTS public.assets
 (
-    id serial NOT NULL,
-    title text NOT NULL,
-    fname text NOT NULL,
+    id integer NOT NULL DEFAULT nextval('assets_id_seq'::regclass),
+    uri text COLLATE pg_catalog."default" NOT NULL,
+    thumbnail text COLLATE pg_catalog."default" NOT NULL,
+    fname text COLLATE pg_catalog."default" NOT NULL,
+    title text COLLATE pg_catalog."default" NOT NULL,
     type asset_type NOT NULL,
+    tags text[] COLLATE pg_catalog."default" NOT NULL,
+    mime text COLLATE pg_catalog."default" NOT NULL,
+    size text COLLATE pg_catalog."default" NOT NULL DEFAULT 0,
     likes integer NOT NULL DEFAULT 0,
     views integer NOT NULL DEFAULT 0,
-    tags text[] NOT NULL,
-    size bigint NOT NULL,
-    length integer NOT NULL,
-    storage text NOT NULL,
-    orientation asset_orientation NOT NULL,
+    scale integer[] NOT NULL,
+    location text COLLATE pg_catalog."default",
+    fps real,
     created timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    bitrate real,
+    rating integer,
+    duration real,
     modified timestamp with time zone,
-    related integer[],
-    thumbnail text,
-    PRIMARY KEY (id, storage),
-    CONSTRAINT unique_asset_id UNIQUE (id)
+    downloads integer NOT NULL DEFAULT 0,
+    coordinates text COLLATE pg_catalog."default",
+    poster text COLLATE pg_catalog."default",
+    genre text COLLATE pg_catalog."default",
+    album text COLLATE pg_catalog."default",
+    comment text COLLATE pg_catalog."default",
+    description text COLLATE pg_catalog."default",
+    free boolean NOT NULL DEFAULT false,
+    CONSTRAINT assets_pkey PRIMARY KEY (id, uri, thumbnail),
+    CONSTRAINT asset_fname UNIQUE (fname)
+        INCLUDE(fname),
+    CONSTRAINT asset_id UNIQUE (id)
         INCLUDE(id),
-    CONSTRAINT unique_asset_storage UNIQUE (storage)
-        INCLUDE(storage)
-);
+    CONSTRAINT asset_thumbnail UNIQUE (thumbnail)
+        INCLUDE(thumbnail),
+    CONSTRAINT asset_uri UNIQUE (uri)
+        INCLUDE(uri)
+)
 
-ALTER TABLE IF EXISTS public.asset
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.assets
     OWNER to postgres;
 `
 
 export const createVideoEntryTable = `
--- Table: public.video_entry
-
--- DROP TABLE IF EXISTS public.video_entry;
-
 CREATE TABLE IF NOT EXISTS public.video_entry
 (
     id integer NOT NULL DEFAULT nextval('video_entry_id_seq'::regclass),
     title text COLLATE pg_catalog."default" NOT NULL,
     fname text COLLATE pg_catalog."default" NOT NULL,
     type asset_type NOT NULL,
-    size integer NOT NULL,
+    size string NOT NULL,
     tags text[] COLLATE pg_catalog."default" NOT NULL,
     mime text COLLATE pg_catalog."default" NOT NULL,
     scale integer[] NOT NULL,
-    duration integer NOT NULL,
-    fps integer,
-    bitrate integer,
+    duration real NOT NULL,
+    fps real,
+    bitrate real,
     location text COLLATE pg_catalog."default",
     uri text COLLATE pg_catalog."default" NOT NULL,
     thumbnail text COLLATE pg_catalog."default" NOT NULL,
     rating integer NOT NULL,
+    poster text COLLATE pg_catalog."default",
+    genre text COLLATE pg_catalog."default",
+    album text COLLATE pg_catalog."default",
+    description text COLLATE pg_catalog."default",
+    comment text COLLATE pg_catalog."default",
+    created timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT video_entry_pkey PRIMARY KEY (id, uri, thumbnail),
     CONSTRAINT unique_video_entry_id UNIQUE (id)
-        INCLUDE(id)
+        INCLUDE(id),
+    CONSTRAINT unique_video_entry_thumbnail UNIQUE (thumbnail)
+        INCLUDE(thumbnail),
     CONSTRAINT unique_video_entry_uri UNIQUE (uri)
         INCLUDE(uri)
-    CONSTRAINT unique_video_entry_thumbnail UNIQUE (thumbnail)
-        INCLUDE(thumbnail)
 )
 
 TABLESPACE pg_default;

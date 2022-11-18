@@ -1,6 +1,7 @@
 import { insert, update } from "sql/common"
 import { pg, es } from "../services"
 import log from "../utils/logger"
+import { select } from "sql/common"
 export default class Asset {
   id?: number
   title?: string
@@ -16,12 +17,19 @@ export default class Asset {
   scale?: [number, number]
   location?: string
   fps?: number
-  esid?: string
   created?: number
   bitrate?: number
   rating?: number
   duration?: number
   modified?: number
+  downloads?: number
+  poster?: string
+  coordinates?: string
+  description?: string
+  comment?: string
+  genre?: string
+  album?: string
+  free?: boolean
 
   constructor(
     id?: number,
@@ -37,13 +45,20 @@ export default class Asset {
     fps?: number,
     bitrate?: number,
     rating?: number,
+    free?: boolean,
     duration?: number,
     location?: string,
-    esid?: string,
+    coordinates?: string,
+    poster?: string,
+    description?: string,
+    comment?: string,
+    genre?: string,
+    album?: string,
     created?: number,
     modified?: number,
     likes?: number,
-    views?: number
+    views?: number,
+    downloads?: number
   ) {
     this.id = id
     this.title = title
@@ -61,10 +76,17 @@ export default class Asset {
     this.duration = duration
     this.modified = modified
     this.location = location
-    this.esid = esid
     this.fps = fps
     this.bitrate = bitrate
     this.rating = rating
+    this.free = free
+    this.downloads = downloads
+    this.poster = poster
+    this.coordinates = coordinates
+    this.album = album
+    this.description = description
+    this.comment = comment
+    this.genre = genre
   }
 
   async create() {
@@ -83,6 +105,13 @@ export default class Asset {
       "fps",
       "bitrate",
       "rating",
+      "poster",
+      "coordinates",
+      "album",
+      "description",
+      "comment",
+      "genre",
+      "free",
     ])
     const values = [
       this.title,
@@ -99,6 +128,13 @@ export default class Asset {
       this.fps,
       this.bitrate,
       this.rating,
+      this.poster,
+      this.coordinates,
+      this.album,
+      this.description,
+      this.comment,
+      this.genre,
+      !this.free ? false : true,
     ]
 
     try {
@@ -113,46 +149,101 @@ export default class Asset {
         return
       }
 
-      const esData = await es().index({
-        index: "assets",
-        id: assets.id.toString(),
-        document: {
-          title: assets.title,
-          fname: assets.fname,
-          type: assets.type,
-          size: assets.size,
-          tags: assets.tags,
-          mime: assets.mime,
-          uri: assets.uri,
-          scale: assets.scale,
-          thumbnail: assets.thumbnail,
-          fps: assets.fps,
-          bitrate: assets.bitrate,
-          rating: assets.rating,
-          duration: assets.duration,
-          location: assets.location,
-          created: assets.created,
-          likes: assets.likes,
-          views: assets.views,
-        },
-      })
-
-      if (esData.result === "created") {
-        const idQuery = update("assets", "id", ["esid"])
-        const idValue = [esData._id, assets.id]
-        const { rows } = await pg().query(idQuery, idValue)
-        if (rows.length > 0) {
-          return assets
-        } else {
-          log.error(
-            `Failed to add esid to Asset(${assets.id}) table when creating the asset.`
-          )
-        }
-      } else {
-        log.error(`Failed add to Asset(${assets.id}) to Elastic Search index`)
-      }
+      const esData = await makeCallToES(assets)
+      return esData
     } catch (err: any) {
       throw new Error(err)
     }
+  }
+
+  async delete(id: number) {
+    const query = `DELETE FROM video_entry WHERE id=$1`
+    const value = [id]
+
+    try {
+      const {
+        rows: [assets],
+      } = await pg().query(query, value)
+      return assets
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+
+  async read(): Promise<Asset> {
+    const query = select("assets", "id")
+    const value = [this.id]
+
+    try {
+      const {
+        rows: [assets],
+      } = await pg().query(query, value)
+      return assets
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+
+  async update() {
+    let idIndex = 0
+    const data = JSON.parse(JSON.stringify(this))
+    const updateKeys = Object.keys(data)
+      .filter((item, index) => {
+        if (item === "id") {
+          idIndex = index
+        }
+        return item !== "id"
+      })
+      .filter(Boolean)
+    const updateValues = Object.values(data).filter(Boolean)
+    updateValues.splice(idIndex, 1)
+    const query = update("assets", "id", updateKeys, "id")
+    const values = [...updateValues, data.id]
+    try {
+      const {
+        rows: [assets],
+      } = await pg().query(query, values)
+
+      if (assets) {
+        const response = await es().update({
+          index: "assets",
+          id: data.id?.toString() || "0",
+          doc: {
+            ...data,
+          },
+        })
+        if (response._id) {
+          return assets
+        }
+      }
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+}
+
+const makeCallToES = async (asset: Asset, tries = 0) => {
+  try {
+    const esData = await es().index({
+      index: "assets",
+      id: asset.id?.toString(),
+      document: {
+        ...asset,
+      },
+    })
+    if (esData.result === "created") {
+      return asset
+    } else {
+      if (tries < 3) {
+        makeCallToES(asset)
+      } else {
+        // Delete Entry in database, if not saved to Elastic Search
+        await pg().query(`DELETE FROM assets WHERE id=$1`, [asset.id])
+        log.error(`Failed add to Asset(${asset.id}) to Elastic Search index`)
+      }
+      return null
+    }
+  } catch (error: any) {
+    throw new Error(error)
   }
 }

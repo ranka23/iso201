@@ -6,13 +6,22 @@ import { validateVideoEntry } from "validations/videoEntry"
 import servErr from "utils/servErr"
 import Asset from "model/Asset"
 
-export const videoEntry = async (req: NextApiRequest, res: NextApiResponse) => {
-  const accessKey = process.env.UPLOAD_ASSET_SECRET
+const checkAccessKey = (req: NextApiRequest) => {
+  const accesskey = process.env.UPLOAD_ASSET_SECRET
   if (
-    accessKey &&
-    req.headers["accessKey"] &&
-    req.headers["accessKey"]?.toString().trim() !== accessKey.trim()
+    accesskey &&
+    req.headers["accesskey"] &&
+    req.headers["accesskey"]?.toString().trim() === accesskey.trim()
   ) {
+    return true
+  }
+  return false
+}
+
+export const videoEntry = async (req: NextApiRequest, res: NextApiResponse) => {
+  const isSecure = checkAccessKey(req)
+
+  if (!isSecure) {
     return res.status(403).json({ error: errors.unauthorized_access })
   }
 
@@ -31,6 +40,13 @@ export const videoEntry = async (req: NextApiRequest, res: NextApiResponse) => {
     uri,
     thumbnail,
     rating,
+    poster,
+    coordinates,
+    genre,
+    album,
+    description,
+    comment,
+    free,
   } = req.body
 
   // Validate all the data received
@@ -55,8 +71,15 @@ export const videoEntry = async (req: NextApiRequest, res: NextApiResponse) => {
       duration,
       fps,
       rating,
+      free,
       bitrate,
-      location
+      location,
+      poster,
+      coordinates,
+      genre,
+      album,
+      description,
+      comment
     ).create()
 
     if (videoEntry?.id) {
@@ -76,18 +99,16 @@ export const bunnyWebHook = async (
   res: NextApiResponse
 ) => {
   const { VideoGuid, Status } = req.body
-  console.log(`CALLED with STATUS: ${Status} and VideoGuid: ${VideoGuid}`)
 
   if (Status !== 3) {
     return res.status(200)
   }
 
-
   try {
     // Check if the video exists in the VideoEntry table
     const video = await new VideoEntry(VideoGuid).read()
 
-    if (video) {
+    if (video.id) {
       // Add the details to the Assets table
       const {
         bitrate,
@@ -104,7 +125,17 @@ export const bunnyWebHook = async (
         type,
         uri,
         rating,
+        poster,
+        album,
+        coordinates,
+        comment,
+        description,
+        genre,
       } = video
+
+      if (!video.free && rating && rating <= 3) {
+        video.free = true
+      }
       const asset = await new Asset(
         undefined,
         title,
@@ -119,13 +150,19 @@ export const bunnyWebHook = async (
         fps,
         bitrate,
         rating,
+        video.free,
         duration,
-        location
+        location,
+        coordinates,
+        poster,
+        description,
+        comment,
+        genre,
+        album
       ).create()
       // return 200 status
-
-
       if (asset) {
+        new VideoEntry().delete(video.id)
         return res.status(200).json({ message: "success" })
       } else {
         // TODO:  If the asset wasn't created do something.
@@ -142,7 +179,82 @@ export const bunnyWebHook = async (
       return res.status(200)
     }
   } catch (error: any) {
+    console.log("ERROR: ", error)
     log.error("VIDEO ENTRY UPLOAD ERROR: ", error)
+    return servErr(res)
+  }
+}
+
+export const createImageAsset = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  const isSecure = checkAccessKey(req)
+  if (!isSecure) {
+    return res.status(403).json({ error: errors.unauthorized_access })
+  }
+
+  try {
+    const {
+      title,
+      fname,
+      type,
+      size,
+      tags,
+      mime,
+      uri,
+      scale,
+      thumbnail,
+      rating,
+      location,
+      coordinates,
+      description,
+      comment,
+      genre,
+      album,
+      free,
+      poster,
+    } = req.body
+
+    // TODO: Validation
+
+    if (free && rating && rating <= 3) {
+      req.body.free = true
+    }
+
+    const fileName = "iso201.com_" + fname.split(".")[0]
+
+    const asset = await new Asset(
+      undefined,
+      title,
+      fileName,
+      type,
+      size,
+      tags,
+      "." + mime,
+      uri,
+      scale,
+      thumbnail,
+      undefined,
+      undefined,
+      rating,
+      req.body.free,
+      undefined,
+      location,
+      coordinates,
+      poster,
+      description,
+      comment,
+      genre,
+      album
+    ).create()
+
+    if (asset?.id) {
+      return res.status(200).json({ message: "success" })
+    }
+    return res.status(400).json({ error: errors.failed_to_upload_image })
+  } catch (error) {
+    log.error("ERROR: ", error)
     return servErr(res)
   }
 }

@@ -1,4 +1,4 @@
-type AssetType = "image" | "video" | "audio"
+type AssetType = "image" | "video" | "audio" | "360"
 
 type PaymentProvider = "solana" | "paypal"
 
@@ -202,23 +202,44 @@ interface ErrorRes {
   message: string
 }
 
+interface ESKeyword {
+  order: "asc" | "desc"
+  fieldName: string
+}
+
+interface ESSort {
+  keywords: Array<ESKeyword>
+  from: number
+  size: number
+}
+
 interface GetAssetReq {
-  id: number,
-  title: string,
-  fname: string,
-  type: AssetType,
-  size: number,
-  search: string,
-  tags: Array<string>,
-  mime: string,
-  likes: number,
-  views: number,
-  scale: [number, number],
-  created: string,
-  modified: string,
-  fps: number,
-  bitrate: number,
-  rating: number,
-  provide: Record<string, string>,
-  operator: "AND" | "OR"
+  id?: number
+  title?: string
+  fname?: string
+  type?: AssetType
+  size?: string
+  search?: string
+  tags?: Array<string>
+  mime?: string
+  likes?: number
+  views?: number
+  scale?: [number, number]
+  created?: string
+  modified?: string
+  fps?: number
+  bitrate?: number
+  rating?: number
+  provide?: Array<string>
+  operator?: "AND" | "OR"
+  sort?: ESSort
+}
+
+interface ScrollData {
+  id: number
+  thumbnail: string
+  type: AssetType
+  scale: [number, number]
+  title: string
+  poster?: string
 }

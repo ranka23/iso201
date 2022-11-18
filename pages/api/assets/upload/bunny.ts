@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import errors from "constants/errors"
-import { bunnyWebHook } from "../../../controller/upload"
+import { bunnyWebHook } from "controller/upload"
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {

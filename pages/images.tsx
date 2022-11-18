@@ -15,8 +15,8 @@ const Images = () => {
         <Hero
           bgURL="/image.webp"
           description="High res Images for your youtube channel, social media and more..."
-          heading="Images for Creators"
-          title="iso201"
+          largeHeader="Images for Creators"
+          topHeader="iso201"
         />
       </main>
     </>

@@ -17,7 +17,13 @@ export default class VideoEntry {
   uri?: string
   thumbnail?: string
   rating?: number
-
+  poster?: string
+  coordinates?: string
+  description?: string
+  comment?: string
+  genre?: string
+  album?: string
+  free?: boolean
 
   constructor(
     uri?: string,
@@ -32,8 +38,15 @@ export default class VideoEntry {
     duration?: number,
     fps?: number,
     rating?: number,
+    free?: boolean,
     bitrate?: number,
-    location?: string
+    location?: string,
+    poster?: string,
+    coordinates?: string,
+    genre?: string,
+    album?: string,
+    description?: string,
+    comment?: string
   ) {
     this.tags = tags
     this.bitrate = bitrate
@@ -49,6 +62,13 @@ export default class VideoEntry {
     this.uri = uri
     this.thumbnail = thumbnail
     this.rating = rating
+    this.free = free
+    this.poster = poster
+    this.comment = comment
+    this.description = description
+    this.coordinates = coordinates
+    this.genre = genre
+    this.album = album
   }
 
   async create(): Promise<VideoEntry> {
@@ -66,7 +86,13 @@ export default class VideoEntry {
       "location",
       "uri",
       "thumbnail",
-      "rating"
+      "rating",
+      "poster",
+      "comment",
+      "description",
+      "coordinates",
+      "genre",
+      "album",
     ])
     const values = [
       this.title,
@@ -82,7 +108,13 @@ export default class VideoEntry {
       this.location,
       this.uri,
       this.thumbnail,
-      this.rating
+      this.rating,
+      this.poster,
+      this.comment,
+      this.description,
+      this.coordinates,
+      this.genre,
+      this.album,
     ]
 
     try {
@@ -103,6 +135,20 @@ export default class VideoEntry {
         rows: [video_entry],
       } = await pg().query(query, value)
       return video_entry
+    } catch (err: any) {
+      throw new Error(err)
+    }
+  }
+
+  async delete(id: number) {
+    try {
+      const query = `DELETE FROM video_entry WHERE id=$1`
+      const value = [id]
+
+      const {
+        rows: [assets],
+      } = await pg().query(query, value)
+      return assets
     } catch (err: any) {
       throw new Error(err)
     }

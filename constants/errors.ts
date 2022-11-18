@@ -114,7 +114,27 @@ const errors = {
   },
   unauthorized_access: {
     code: "request_not_found",
-    message: "Unauthorized access to resource"
+    message: "Unauthorized access to resource",
+  },
+  assets_not_found: {
+    code: "assets_not_found",
+    message: "No Assets found for your search.",
+  },
+  asset_already_exists: {
+    code: "asset_already_exits",
+    message: "Asset already exits",
+  },
+  failed_to_upload_image: {
+    code: "failed_to_upload_image",
+    message: "Failed to upload image asset to server",
+  },
+  failed_to_update_asset: {
+    code: "failed_to_update_asset",
+    message: "Failed to update the asset"
+  },
+  asset_id_not_found: {
+    code: "asset_id_not_found",
+    message: "Asset ID required."
   }
 }
 
