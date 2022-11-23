@@ -4,7 +4,6 @@ import Hero from "components/pages/Home/Hero/Hero"
 import { getSearch } from "../controller/assets"
 import List from "../components/widgets/List/List"
 
-
 interface Props {
   hero: {
     image: string
@@ -37,7 +36,9 @@ const Home: NextPage<Props> = ({ hero, onScrollData }: Props) => {
           description={hero.description}
           largeHeader={hero.largeHeader}
         />
-        <div className="mt-12"><List onScrollData={onScrollData} /></div>
+        <div className="mt-12">
+          <List onScrollData={onScrollData} />
+        </div>
       </main>
     </div>
   )
@@ -71,7 +72,16 @@ export const getStaticProps = async () => {
       from: 0,
       size: 100,
     },
-    provide: ["thumbnail", "type", "id", "scale", "title", "poster", "genre", "album"],
+    provide: [
+      "thumbnail",
+      "type",
+      "id",
+      "scale",
+      "title",
+      "poster",
+      "genre",
+      "album",
+    ],
   })
 
   return {

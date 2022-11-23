@@ -1,11 +1,15 @@
-import { getSearch } from "controller/assets"
-import { GetStaticPropsContext } from "next"
+import AssetDetails from "components/Asset/AssetDetails"
 import BunnyPlayer from "components/widgets/BunnyPlayer/BunnyPlayer"
-import Icon from "components/widgets/Icon/Icon"
+import LargeImage from "components/widgets/LargeImage/LargeImage"
+import { getSearch, getSimilar } from "controller/assets"
+import { GetStaticPropsContext } from "next"
+import AssetThumbnail from "components/widgets/AssetThumbnail/AssetThumbnail"
+import BreadCrumb from "components/widgets/BreadCrumb/BreadCrumb"
+import log from "utils/logger"
 import css from "./index.module.css"
-import heart from "public/icons/heart.svg"
-import axios from "axios"
-import { useState } from "react"
+import Icon from "components/widgets/Icon/Icon"
+import camcord from "public/icons/camcord.svg"
+import Link from "next/link"
 
 interface Props {
   id: number
@@ -23,28 +27,9 @@ interface Props {
   duration: string
   description: string
   fname: string
-}
-
-const downloadAsset = ({ url = "", fname = "", mime = "" }) => {
-  axios({
-    url,
-    method: "GET",
-    responseType: "blob",
-  }).then((response) => {
-    // create file link in browser's memory
-    const href = URL.createObjectURL(response.data)
-
-    // create "a" HTML element with href to file & click
-    const link = document.createElement("a")
-    link.href = href
-    link.setAttribute("download", fname + mime) //or any other extension
-    document.body.appendChild(link)
-    link.click()
-
-    // clean up "a" element & remove ObjectURL
-    document.body.removeChild(link)
-    URL.revokeObjectURL(href)
-  })
+  album: string
+  genre: string
+  similar: Array<ScrollDataHits>
 }
 
 const Asset: React.FC<Props> = ({
@@ -53,105 +38,73 @@ const Asset: React.FC<Props> = ({
   title,
   description,
   fps,
-  likes,
-  views,
+  type,
   size,
   mime,
   tags,
   scale,
   duration,
   fname,
+  genre,
+  album,
+  isFree,
+  similar,
 }) => {
-  const [error, setError] = useState("")
-  const fileData = [
-    {
-      label: "Duration",
-      value: `${duration}s`,
-    },
-    {
-      label: "Resolution",
-      value: `${scale[0]}x${scale[1]}`,
-    },
-    {
-      label: "Size",
-      value: size,
-    },
-    {
-      label: "FPS",
-      value: fps,
-    },
-    {
-      label: "Type",
-      value: mime,
-    },
-  ]
-  const handleOnDownloadClick = async () => {
-    try {
-      const res = await axios.post<{ url: string }>(
-        "http://localhost:3000/api/assets/download",
-        {
-          assetID: id,
-        }
-      )
-      const { url } = res.data
-      if (url.length < 5) {
-        // TODO: Send log to sentry or something
-        return setError(
-          "Unable to download resource, please try after some time."
-        )
-      }
-      downloadAsset({
-        url,
-        fname,
-        mime,
-      })
-    } catch (error: any) {
-      // TODO: Send log to sentry or something
-      return setError(
-        "Unable to download resource, please try after some time."
-      )
-    }
-  }
   return (
     <div className={css.container}>
       <div>
-        <BunnyPlayer videoId={uri} />
-        <h2 className="text-2xl font-medium mt-4">{title}</h2>
-        <div className="flex justify-between items-center mt-4 mb-2">
-          <div className="flex items-center">
-            <button
-              onClick={handleOnDownloadClick}
-              className="py-2 px-4 mr-4 border border-black text-xl font-bold hover:bg-black hover:text-white transition"
-            >
-              Download
-            </button>
-            <span className="flex items-center mr-6">
-              <Icon src={heart} width={24} />
-              {parseInt(likes) !== 0 ? (
-                <span className="mr-2 text-xl font-medium">{likes}</span>
-              ) : null}
-            </span>
-          </div>
-          <span className="text-xl font-medium">{views} views</span>
-        </div>
-        <div className="flex items-center gap-12 mb-6">
-          {fileData.map((item) => (
-            <div key={item.label}>
-              <span className="font-medium mr-1">{item.label}</span>
-              <span className="text-xl">{item.value}</span>
-            </div>
-          ))}
-        </div>
-        <p>{description}</p>
-        <span>
-          {tags.map((item) => (
-            <span className="py-2 px-3 rounded bg-[#eee] mr-4" key={item}>
-              {item}
-            </span>
-          ))}
-        </span>
+        {type === "video" ? (
+          <BunnyPlayer videoId={uri} id={id} />
+        ) : (
+          <LargeImage src={uri} alt={title} />
+        )}
+        <AssetDetails
+          album={album}
+          description={description}
+          duration={duration}
+          fname={fname}
+          fps={fps}
+          genre={genre}
+          id={id}
+          isFree={isFree}
+          mime={mime}
+          scale={scale}
+          size={size}
+          tags={tags}
+          title={title}
+          type={type}
+        />
       </div>
-      <div>Second Container</div>
+      <div>
+        {similar.map((item) => (
+          <Link key={item.id} href={`/${item.genre}/${item.album}/${item.id}`}>
+            <a>
+              <div className="flex gap-2 mb-4 overflow-hidden">
+                <div className="min-w-[240px] max-w-[240px] min-h-[135px] max-h-[135px]">
+                  <AssetThumbnail showIcon={false} item={item} link={false} />
+                </div>
+                <div className="ml-2 pr-4">
+                  <p className="font-medium text-lg opacity-90 mb-2 line-clamp-3">
+                    {item.title}
+                  </p>
+                  {item.duration ? (
+                    <div className="flex items-center">
+                      <Icon className="opacity-40" src={camcord} width={24} />
+                      <p className="bg-[#eee] text-sm rounded inline py-[2px] px-2 ml-2">
+                        {item.duration}
+                        {item.type === "video" ? " seconds" : ""}
+                      </p>
+                    </div>
+                  ) : null}
+                  <div className="mt-2">
+                    <BreadCrumb levels={[item.genre, item.album]} />
+                  </div>
+                </div>
+              </div>
+            </a>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
@@ -164,35 +117,54 @@ export const getStaticPaths = async () => {
 }
 
 export const getStaticProps = async (context: GetStaticPropsContext) => {
-  const assets = await getSearch({
-    id: parseInt(context.params?.asset as string),
-  })
+  try {
+    const assets = await getSearch({
+      id: parseInt(context.params?.asset as string),
+    })
+    const similar = await getSimilar(context.params?.asset as string, [
+      "id",
+      "thumbnail",
+      "title",
+      "type",
+      "scale",
+      "poster",
+      "genre",
+      "album",
+      "duration",
+    ])
+    const asset = assets?.hits.hits[0]?._source
 
-  const asset = assets?.hits.hits[0]._source
-  if (asset) {
-    return {
-      props: {
-        id: asset.id,
-        isFree: asset.free,
-        type: asset.type,
-        title: asset.title,
-        uri: asset.uri,
-        tags: asset.tags,
-        scale: asset.scale,
-        fps: asset.fps,
-        mime: asset.mime,
-        likes: asset.likes,
-        views: asset.views,
-        size: asset.size,
-        duration: asset.duration,
-        description: asset.description,
-        fname: asset.fname,
-      },
+    if (asset) {
+      return {
+        props: {
+          id: asset.id,
+          isFree: asset.free,
+          type: asset.type,
+          title: asset.title,
+          uri: asset.type === "video" ? asset.uri : asset.poster,
+          tags: asset.tags,
+          scale: asset.scale,
+          fps: asset.fps,
+          mime: asset.mime,
+          size: asset.size,
+          duration: asset.duration,
+          description: asset.description,
+          fname: asset.fname,
+          genre: asset.genre,
+          album: asset.album,
+          similar,
+        },
+      }
+    } else {
+      return {
+        props: {},
+      }
     }
-  } else {
-    return {
-      props: {},
-    }
+  } catch (error: any) {
+    log.error(
+      `AssetID: ${context.params?.asset} getStaticProps for Asset Page: `,
+      error
+    )
   }
 }
 

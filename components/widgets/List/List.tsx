@@ -1,72 +1,76 @@
-import Link from "next/link"
-import Image from "./Image"
-import Video from "./Video"
+
+import css from "./index.module.css"
+import { useMemo } from "react"
+import AssetThumbnail from "../AssetThumbnail/AssetThumbnail"
+
+
 
 interface ListProps {
   onScrollData: {
-    hits: Array<{
-      id: number
-      thumbnail: string
-      type: AssetType
-      scale: [number, number]
-      title: string
-      poster?: string
-      genre: string
-      album: string
-    }> | null
+    hits: Array<ScrollDataHits> | null
     total: number
   }
 }
 
 const List: React.FC<ListProps> = ({ onScrollData }) => {
-  return (
-    <div className="asset-list">
-      {onScrollData
-        ? onScrollData?.hits
-            ?.map((item) => {
-              if (item.type) {
-                switch (item?.type) {
-                  case "image": {
-                    return (
-                      <Link
-                        key={item.id}
-                        href={`${item.genre}/${item.album}/${item.id}`}
-                      >
-                        <a className="inline-block mb-[16px]">
-                          <Image data={item} alt={item.title} />
-                        </a>
-                      </Link>
-                    )
-                  }
-                  case "video":
-                    return (
-                      <Link
-                        key={item.id}
-                        href={`${item.genre}/${item.album}/${item.id}`}
-                      >
-                        <a className="inline-block mb-[16px]">
-                          <Video data={item} />
-                        </a>
-                      </Link>
-                    )
+  const data = useMemo(() => {
+    const a: Array<ScrollDataHits> = []
+    const b: Array<ScrollDataHits> = []
+    const c: Array<ScrollDataHits> = []
+    let pause = false
+    let turn = 1
+    onScrollData?.hits?.forEach((item) => {
+      pause = false
+      if (turn === 1 && !pause) {
+        a.push(item)
+        pause = true
+        turn = 2
+      }
+      if (turn === 2 && !pause) {
+        b.push(item)
+        turn = 3
+        pause = true
+      }
+      if (turn === 3 && !pause) {
+        c.push(item)
+        turn = 1
+        pause = true
+      }
+    })
 
-                  case "360": {
-                    // TODO:
-                    return null
-                  }
-                  case "audio": {
-                    // TODO:
-                    return null
-                  }
-                  default: {
-                    return null
-                  }
-                }
-              }
-            })
-            .filter(Boolean)
-        : null}
-      <div id="homepage-list-end" />
+    return {
+      a,
+      b,
+      c,
+    }
+  }, [onScrollData])
+
+  return (
+    <div className={css.container}>
+      <div className={css.list}>
+        {data.a && data.a.length > 0 ? (
+          <div className={`${css.column} ${css.column_1}`}>
+            {data.a.map((item) => (
+              <AssetThumbnail key={item.id} item={item} />
+            ))}
+          </div>
+        ) : null}
+        {data.b && data.b.length > 0 ? (
+          <div className={`${css.column} ${css.column_2}`}>
+            {data.b.map((item) => (
+              <AssetThumbnail key={item.id} item={item} />
+            ))}
+          </div>
+        ) : null}
+        {data.c && data.c.length > 0 ? (
+          <div className={`${css.column} ${css.column_3}`}>
+            {data.c.map((item) => (
+              <AssetThumbnail key={item.id} item={item} />
+            ))}
+          </div>
+        ) : null}
+      </div>
+      <div id="asset-list-end" />
     </div>
   )
 }

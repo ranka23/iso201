@@ -1,8 +1,10 @@
 import useSWR, { SWRConfiguration } from "swr"
 import {
+  getAssetStat,
   getTest,
   getTestProtected,
-} from "./fetchers/query"
+  hasUserLikedAsset,
+} from "./fetcher"
 
 const useSWRBuilder = <T>(
   key: Array<any> | string,
@@ -26,4 +28,16 @@ export const useTest = (config?: SWRConfiguration) => {
 
 export const useTestProtected = (config?: SWRConfiguration) => {
   return useSWRBuilder(["/test/protected", "ide"], getTestProtected, config)
+}
+
+export const useAssetStats = (id: number, config?: SWRConfiguration) => {
+  return useSWRBuilder([`/assets/${id}/stats`], getAssetStat, config)
+}
+
+export const useHasUserLikedAsset = (assetID: number, config?: SWRConfiguration) => {
+  return useSWRBuilder(
+    [`/assets/${assetID}/likes/`],
+    hasUserLikedAsset,
+    config
+  )
 }

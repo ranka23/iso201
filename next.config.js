@@ -1,5 +1,5 @@
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   images: {
     domains: ["iso201-test.b-cdn.net", "vz-8f79c444-075.b-cdn.net"],

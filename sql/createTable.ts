@@ -190,3 +190,26 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.video_entry
     OWNER to postgres;
 `
+
+export const createLikesTable = `
+CREATE TABLE public.likes
+(
+    "user" integer NOT NULL,
+    asset integer NOT NULL,
+    CONSTRAINT comb_pk_likes PRIMARY KEY ("user", asset)
+        INCLUDE("user", asset),
+    CONSTRAINT like_fk_asset FOREIGN KEY (asset)
+        REFERENCES public.assets (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT like_fk_user FOREIGN KEY ("user")
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE IF EXISTS public.likes
+    OWNER to postgres;
+`

@@ -1,0 +1,12 @@
+Daily cron jobs:
+Pro users whose subscriptions have expired
+Likes, views and downloads updated in es from the ones in postgres
+
+
+Provide downloads at 720p, 1080p
+
+
+Implement 360 videos
+
+
+

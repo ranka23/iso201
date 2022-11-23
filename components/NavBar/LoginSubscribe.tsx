@@ -30,17 +30,19 @@ const LoginSubscribe = () => {
         <span className="mr-0.5 relative">Pricing</span>
         <Icon className="-rotate-90" src={chevron} />
       </span>
-      <Link href={'/login'}>
-        <a className={className}>
-          Login
-        </a>
+      <Link href={"/login"}>
+        <a className={className}>Login</a>
       </Link>
       <span className="px-3 opacity-60">/</span>
       <Link href="/subscribe">
         <a className={className}>Subscribe</a>
       </Link>
       <FadeInOut isTop={true} isVisible={showPricingPopup}>
-        <div className="z-9999 absolute mt-6 right-0">
+        <div
+          className={`${
+            showPricingPopup ? "z-9999" : "z-0"
+          } absolute mt-6 right-0`}
+        >
           <Pricing />
         </div>
         <div

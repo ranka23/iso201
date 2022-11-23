@@ -1,6 +1,32 @@
-const libraryId = process.env.NEXT_PUBLIC_BUNNY_VIDEO_LIBRARY_ID
+import { useEffect } from "react"
+import { post } from "services/axios"
+import { useAssetStats } from "network/hooks"
 
-const BunnyPlayer = ({ videoId }: { videoId: string | number }) => {
+const BunnyPlayer = ({
+  videoId,
+  id,
+}: {
+  videoId: string | number
+  id: number
+}) => {
+  const { data, mutate } = useAssetStats(id)
+  useEffect(() => {
+    // Register video view count on page load
+    try {
+      if (typeof window !== "undefined") {
+        post(`/assets/${id}/stats`, {
+          assetID: id,
+          updateValue: "view",
+        })
+        mutate({
+          id,
+          likes: data?.likes || 0,
+          views: (data?.views || 0) + 1,
+        })
+      }
+    } catch (error: any) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   return (
     <div
       style={{
@@ -9,7 +35,7 @@ const BunnyPlayer = ({ videoId }: { videoId: string | number }) => {
       }}
     >
       <iframe
-        src={`https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?autoplay=true`}
+        src={`${process.env.NEXT_PUBLIC_BUNNY_VIDEO_PLAYER_IFRAME_URL}/${process.env.NEXT_PUBLIC_BUNNY_VIDEO_LIBRARY_ID}/${videoId}`}
         loading="lazy"
         style={{
           border: "none",
@@ -19,7 +45,7 @@ const BunnyPlayer = ({ videoId }: { videoId: string | number }) => {
           width: "100%",
         }}
         allowFullScreen={true}
-      ></iframe>
+      />
     </div>
   )
 }

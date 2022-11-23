@@ -11,6 +11,24 @@ interface FiltersObj {
   }
 }
 
+export const createESSimilarSearchQuery = (id: string | number) => {
+  return {
+    query: {
+      more_like_this: {
+        fields: ["type", "title", "tags", "description", "genre", "album"],
+        like: [
+          {
+            _index: "assets",
+            _id: `${id}`,
+          },
+        ],
+        min_term_freq: 1,
+        max_query_terms: 12,
+      },
+    },
+  }
+}
+
 export const createESSearchQuery = (data: GetAssetReq) => {
   const {
     bitrate,

@@ -1,0 +1,54 @@
+.container {
+  max-width: 92rem;
+  margin: auto;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+.list {
+  display: flex;
+  gap: 16px;
+}
+
+.column {
+  max-width: 420px;
+}
+
+@media screen and (max-width: 1308px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .list {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+@media screen and (max-width: 864px) {
+  .container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .list {
+    display: block;
+    columns: 2;
+    gap: 8px;
+  }
+}
+
+@media screen and (max-width: 428px) {
+  .container {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+  }
+}

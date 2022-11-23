@@ -1,5 +1,5 @@
 import { animated, useSpring } from "@react-spring/web"
-import { ReactNode } from "react"
+import { ReactNode, useCallback, useEffect, useState } from "react"
 
 interface Props {
   isVisible: boolean
@@ -16,10 +16,24 @@ const FadeInOut: React.FC<Props> = ({
   y = 24,
   x,
 }) => {
+  const [display, setDisplay] = useState("none")
+
+  useEffect(() => {
+    if (isVisible) {
+      setDisplay("block")
+    } else {
+      setTimeout(() => {
+        setDisplay("none")
+      }, 700)
+    }
+  }, [isVisible])
+
   const values: Record<string, string | number> = {
     opacity: isVisible ? 1 : 0,
+    display,
   }
-  if (isTop) {
+
+  if (isTop && isVisible) {
     values.zIndex = 99999
   }
   if (x) {

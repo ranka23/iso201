@@ -29,7 +29,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       // You can render any custom fallback UI
       return (
         <div>
-          <h2>Oops, there is an error!</h2>
+          <h2>Oops, there was an error!</h2>
           <button
             type="button"
             onClick={() => this.setState({ hasError: false })}

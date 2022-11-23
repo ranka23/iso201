@@ -1,4 +1,4 @@
-import { insert, update } from "sql/common"
+import { insert, selectResponse, update } from "sql/common"
 import { pg, es } from "../services"
 import log from "../utils/logger"
 import { select } from "sql/common"
@@ -184,6 +184,19 @@ export default class Asset {
     }
   }
 
+  async getStats(): Promise<Asset> {
+    const query = selectResponse("assets", "id", ["id", "likes", "views"])
+    const value = [this.id]
+    try {
+      const {
+        rows: [assets],
+      } = await pg().query(query, value)
+      return assets
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+
   async update() {
     let idIndex = 0
     const data = JSON.parse(JSON.stringify(this))
@@ -216,6 +229,32 @@ export default class Asset {
           return assets
         }
       }
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+
+  async incrementView(): Promise<Asset> {
+    const query = `UPDATE assets SET views = views + 1 WHERE id=$1 RETURNING id`
+    const value = [this.id]
+    try {
+      const {
+        rows: [assets],
+      } = await pg().query(query, value)
+      return assets
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+
+  async mutateLike(operation: "+" | "-"): Promise<Asset> {
+    const query = `UPDATE assets SET likes = likes ${operation} 1 WHERE id=$1 RETURNING id`
+    const value = [this.id]
+    try {
+      const {
+        rows: [assets],
+      } = await pg().query(query, value)
+      return assets
     } catch (error: any) {
       throw new Error(error)
     }

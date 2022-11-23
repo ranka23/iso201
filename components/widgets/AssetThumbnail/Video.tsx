@@ -2,6 +2,7 @@ import Icon from "components/widgets/Icon/Icon"
 import reel from "public/icons/reel.svg"
 import { useState } from "react"
 import { THUMBNAIL_WIDTH } from "../../../constants"
+import { useRef } from "react"
 
 const bunnyPullZone = process.env.NEXT_PUBLIC_BUNNY_PULL_ZONE_URL
 const imageURL = process.env.NEXT_PUBLIC_BUNNY_IMAGE_STORAGE_URL
@@ -9,9 +10,14 @@ const width = THUMBNAIL_WIDTH
 
 interface VideoProps {
   data: ScrollData
+  showIcon?: boolean
 }
 
-const Video: React.FC<VideoProps> = ({ data: { thumbnail, poster } }) => {
+const Video: React.FC<VideoProps> = ({
+  data: { thumbnail, poster },
+  showIcon = true,
+}) => {
+  const ref = useRef(null)
   const [showReel, setShowReel] = useState(true)
   const handleOnMouseOver = (
     e: React.MouseEvent<HTMLVideoElement, MouseEvent>
@@ -41,9 +47,13 @@ const Video: React.FC<VideoProps> = ({ data: { thumbnail, poster } }) => {
   }
 
   return (
-    <div className={`relative max-w-[${width}px]`}>
-      <div className="absolute right-3 bottom-1">
-        {showReel && <Icon src={reel} />}
+    <div ref={ref} className={`relative max-w-[${width}px]`}>
+      <div
+        className={`absolute right-3 bottom-1 opacity-80 ${
+          showReel ? "" : "opacity-0"
+        } hover:transition-opacity transition-opacity`}
+      >
+        {showIcon ? <Icon src={reel} width={28} /> : false}
       </div>
       <video
         preload="none"
@@ -54,6 +64,9 @@ const Video: React.FC<VideoProps> = ({ data: { thumbnail, poster } }) => {
         onMouseLeave={handleOnMouseLeave}
         playsInline
         muted
+        style={{
+          width: `${width}px`,
+        }}
       >
         <source src={`${bunnyPullZone}/${thumbnail}/play_360p.mp4`} />
       </video>

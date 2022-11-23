@@ -1,0 +1,23 @@
+.item {
+  line-height: 0;
+  max-width: 420px;
+  margin-bottom: 16px;
+}
+
+@media screen and (max-width: 1308px) {
+  .item {
+    margin-bottom: 12px;
+  }
+}
+
+@media screen and (max-width: 864px) {
+  .item {
+    margin-bottom: 8px;
+  }
+}
+
+@media screen and (max-width: 428px) {
+  .item {
+    margin-bottom: 4px;
+  }
+}

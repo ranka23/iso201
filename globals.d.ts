@@ -213,6 +213,8 @@ interface ESSort {
   size: number
 }
 
+type VideoResolution = "480p" | "720p" | "1080p" | "original"
+
 interface GetAssetReq {
   id?: number
   title?: string
@@ -232,6 +234,10 @@ interface GetAssetReq {
   rating?: number
   provide?: Array<string>
   operator?: "AND" | "OR"
+  description?: string
+  genre?: string
+  album?: string
+  comment?: string
   sort?: ESSort
 }
 
@@ -242,4 +248,16 @@ interface ScrollData {
   scale: [number, number]
   title: string
   poster?: string
+}
+
+type ScrollDataHits = {
+  id: number
+  thumbnail: string
+  type: AssetType
+  scale: [number, number]
+  title: string
+  poster?: string
+  genre: string
+  album: string
+  duration?: number
 }

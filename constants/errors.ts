@@ -130,11 +130,43 @@ const errors = {
   },
   failed_to_update_asset: {
     code: "failed_to_update_asset",
-    message: "Failed to update the asset"
+    message: "Failed to update the asset",
   },
   asset_id_not_found: {
     code: "asset_id_not_found",
-    message: "Asset ID required."
+    message: "Asset ID required.",
+  },
+  asset_id_required: {
+    code: "asset_id_required",
+    message: "Asset ID required",
+  },
+  failed_to_find_data: {
+    code: "failed_to_find_data",
+    message: "Failed to find data",
+  },
+  failed_to_find_asset: {
+    code: "failed_to_find_asset",
+    message: "Failed to find asset",
+  },
+  failed_to_find_resource: {
+    code: "failed_to_find_resource",
+    message: "Failed to find resource",
+  },
+  user_must_be_logged_in: {
+    code: "user_must_be_logged_in",
+    message: "User must be logged in",
+  },
+  failed_to_save_like: {
+    code: "failed_to_save_like",
+    message: "Failed to save like",
+  },
+  unable_to_download_resource: {
+    code: "unable_to_download_resource",
+    message: "Unable to download resource. Please try after some time.",
+  },
+  failed_to_heart_resource: {
+    code: "failed_to_heart_resource",
+    message: "Failed to Like resource. Unable to save it for future viewing."
   }
 }
 

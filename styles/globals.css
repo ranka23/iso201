@@ -6,19 +6,18 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   color: #333;
   font-size: 14px;
   overflow-x: hidden;
 }
-
 
 .plyr__controls .videoThumbnail {
   display: none;
 }
 
 input {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   color: #333;
 }
 
@@ -39,44 +38,16 @@ input {
   accent-color: #333333;
 }
 
-
-.flex-grid > * {
-  flex: 0 1 auto;
+#like-heart-icon {
+  fill: transparent;
+  stroke: #D75A4A;
+  stroke-width: 50px;
+  transition: all 0.6s linear;
 }
 
-/* Makes a container and it's children responsive with grid layout */
-.flex-grid {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  gap: 1rem;
-  justify-content: center;
-  max-width: 1500px;
-  margin: auto;
+#like-heart-icon.filled {
+  fill: #D75A4A;
+  stroke: #D75A4A;
+  stroke-width: 20px;
+  transition: all 0.6s linear;
 }
-
-.drop-shadow {
-  box-shadow: 0px 16px 32px rgba(25, 23, 29, 0.04), 0px 8px 16px rgba(25, 23, 29, 0.04),
-    0px 4px 8px rgba(25, 23, 29, 0.04), 0px 2px 4px rgba(25, 23, 29, 0.04), 0px 1px 2px rgba(25, 23, 29, 0.04);
-}
-
-.asset-list {
-  column-count: 3;
-  max-width: 85rem;
-  margin: auto;
-  gap: 16px;
-}
-
-@media screen and (max-width: 480px) {
-  .asset-list {
-    column-count: 1;
-  }
-}
-
-
-@media screen and (max-width: 810px) {
-  .asset-list {
-    column-count: 2;
-  }
-}
-

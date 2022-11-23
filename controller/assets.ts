@@ -2,11 +2,15 @@ import { SearchRequest } from "@elastic/elasticsearch/lib/api/types"
 import Asset from "model/Asset"
 import { NextApiRequest, NextApiResponse } from "next"
 import { es } from "services"
-import { createESSearchQuery, createESSortQuery } from "utils/elasticSearch"
+import {
+  createESSearchQuery,
+  createESSimilarSearchQuery,
+  createESSortQuery,
+} from "utils/elasticSearch"
 import log from "utils/logger"
 import servErr from "utils/servErr"
-import errors from "../constants/errors"
-import User from "../model/User"
+import errors from "constants/errors"
+import User from "model/User"
 import crypto from "crypto"
 
 export const getAssets = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -51,6 +55,59 @@ export const getSearch = async (data: GetAssetReq) => {
     return null
   } catch (err: any) {
     throw new Error(err)
+  }
+}
+
+export const getSimilar = async (id: string | number, provide: string[]) => {
+  const query = createESSimilarSearchQuery(id)
+  try {
+    let options: SearchRequest = {
+      index: "assets",
+      ...query,
+    }
+
+    if (provide && provide.length) {
+      options._source = provide
+    }
+
+    const videos = await es().search<Asset>(options)
+    if (videos?.hits?.hits && videos.hits.hits.length > 0) {
+      return videos.hits.hits.map(({ _source: itm }) => itm).filter(Boolean)
+    }
+    return null
+  } catch (error: any) {
+    throw new Error(error)
+  }
+}
+
+export const getSimilarThumbnails = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  const { assetID, provide } = req.query
+  try {
+    const query = await getSimilar(
+      assetID as string,
+      (provide as string[]) || [
+        "id",
+        "thumbnail",
+        "title",
+        "type",
+        "scale",
+        "poster",
+        "genre",
+        "album",
+        "likes",
+        "views",
+      ]
+    )
+    if (query?.length) {
+      return res.status(200).json({ similar: query })
+    }
+    return res.status(500).json({ error: errors.failed_to_find_data })
+  } catch (error: any) {
+    log.error("Update asset error: ", error)
+    return servErr(res)
   }
 }
 
@@ -133,34 +190,31 @@ export const downloadAsset = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const { assetID } = req.body
-
-  console.log("ASSET ID: ", assetID)
-
-  if (!assetID || typeof assetID !== "number") {
+  const { assetID } = req.query
+  if (!assetID) {
     return res.status(400).json({ errors: errors.asset_id_not_found })
   }
 
   try {
     // Check if asset is free or paid
-    const asset = await new Asset(assetID).read()
+    const asset = await new Asset(parseInt(assetID as string)).read()
 
-    if (!asset.uri) {
+    if (!asset?.uri) {
       return res.status(404).json({ errors: errors.assets_not_found })
     }
 
-    if (asset.free) {
+    if (asset?.free) {
       // Allow download
       return sendDownloadUrl(asset, res)
     } else {
-      if (!req.user) {
-        return res.redirect("/subscribe")
+      if (!req?.user) {
+        return res.status(200).json({ message: "unauthorized" })
       }
       const { id: userID, pro } = req?.user
 
       if (!pro) {
         // Redirect to Purchase page
-        return res.redirect("/subscribe")
+        return res.status(200).json({ message: "unauthorized" })
       } else {
         const user = await new User(userID).readBasicInfo()
         if (user?.pro) {
@@ -168,7 +222,7 @@ export const downloadAsset = async (
           return sendDownloadUrl(asset, res)
         } else {
           // Redirect to Purchase page
-          return res.redirect("/subscribe")
+          return res.status(200).json({ message: "unauthorized" })
         }
       }
     }
@@ -191,7 +245,7 @@ const createDownloadUrl = ({ uri = "", type = "" as AssetType }) => {
   let securityKey = process.env.BUNNY_VIDEO_DOWNLOAD_SECRET
   let url = process.env.BUNNY_VIDEO_PULL_ZONE
   if (type === "image") {
-    path = `${uri}`
+    path = `/images/${uri}`
     securityKey = process.env.BUNNY_IMAGE_DOWNLOAD_SECRET
     url = process.env.BUNNY_IMAGE_PULL_ZONE
   }
@@ -207,12 +261,5 @@ const createDownloadUrl = ({ uri = "", type = "" as AssetType }) => {
   token = token.replace(/\+/g, "-").replace(/\//g, "_").replace(/\=/g, "")
 
   // Generate the URL
-  return (
-    url +
-    path +
-    "?token=" +
-    token +
-    "&expires=" +
-    expires
-  )
+  return url + path + "?token=" + token + "&expires=" + expires
 }

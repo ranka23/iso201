@@ -108,7 +108,7 @@ export const bunnyWebHook = async (
     // Check if the video exists in the VideoEntry table
     const video = await new VideoEntry(VideoGuid).read()
 
-    if (video.id) {
+    if (video?.id) {
       // Add the details to the Assets table
       const {
         bitrate,
@@ -133,7 +133,7 @@ export const bunnyWebHook = async (
         genre,
       } = video
 
-      if (!video.free && rating && rating <= 3) {
+      if (!video?.free && rating && rating <= 3) {
         video.free = true
       }
       const asset = await new Asset(
@@ -169,18 +169,18 @@ export const bunnyWebHook = async (
         log.warn(
           `Asset for uri: ${VideoGuid} was not created inspite receiving the data`
         )
-        return res.status(200)
+        return res.status(200).json({ message: "success" })
       }
     } else {
       // TODO: If the video entry is not found do something.
       log.warn(
         `Asset for uri: ${VideoGuid} was not created because video entry was not found for data`
       )
-      return res.status(200)
+      return res.status(200).json({ message: "success" })
     }
   } catch (error: any) {
     console.log("ERROR: ", error)
-    log.error("VIDEO ENTRY UPLOAD ERROR: ", error)
+    log.error("BUNNY WEB HOOK ERROR: ", error)
     return servErr(res)
   }
 }
