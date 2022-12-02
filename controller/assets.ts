@@ -58,6 +58,52 @@ export const getSearch = async (data: GetAssetReq) => {
   }
 }
 
+export const getThumbnailData = async (data?: GetAssetReq) => {
+  const response = await getSearch({
+    sort: {
+      keywords: [
+        {
+          fieldName: "rating",
+          order: "desc",
+        },
+        {
+          fieldName: "created",
+          order: "desc",
+        },
+        {
+          fieldName: "likes",
+          order: "desc",
+        },
+        {
+          fieldName: "downloads",
+          order: "desc",
+        },
+        {
+          fieldName: "views",
+          order: "desc",
+        },
+      ],
+      from: 0,
+      size: 50,
+    },
+    provide: [
+      "thumbnail",
+      "type",
+      "id",
+      "scale",
+      "title",
+      "poster",
+      "genre",
+      "album",
+    ],
+    ...data,
+  })
+  return {
+    hits: response?.hits.hits.map((item) => item._source),
+    total: response?.hits.total,
+  }
+}
+
 export const getSimilar = async (id: string | number, provide: string[]) => {
   const query = createESSimilarSearchQuery(id)
   try {
@@ -262,4 +308,40 @@ const createDownloadUrl = ({ uri = "", type = "" as AssetType }) => {
 
   // Generate the URL
   return url + path + "?token=" + token + "&expires=" + expires
+}
+
+export const populateFilter = async (page?: string, genre?: string) => {
+  try {
+    const data = await new Asset().populateFilters(genre)
+    const extractValues = (data?: Array<{ [key: string]: any }>) => {
+      let key = ""
+      return data
+        ?.map((itm) => {
+          key = Object.keys(itm)[0]
+          return itm[key]
+        })
+        .filter(Boolean)
+    }
+
+    const filters: PopulateFilters = {
+      type: extractValues(data?.typeQuery) as Array<AssetType>,
+      scale: extractValues(data?.scaleQuery) as Array<[number, number]>,
+      genre: extractValues(data?.genreQuery) as Array<string>,
+      album: extractValues(data?.albumQuery) as Array<string>,
+      fps: extractValues(data?.fpsQuery) as Array<number>,
+      views: data?.viewsQuery[0].views,
+      duration: data?.durationQuery[0].duration,
+    }
+
+    if (page === "genre") {
+      delete filters.genre
+    } else if (page === "album") {
+      delete filters.album
+      delete filters.genre
+    }
+
+    return filters
+  } catch (error: any) {
+    throw new Error(error)
+  }
 }

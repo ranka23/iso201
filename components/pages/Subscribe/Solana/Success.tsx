@@ -11,7 +11,7 @@ const Success = () => {
         Congrats you are now a Pro user. Thank you for choosing us! <br></br>Wish you a pleasant day. 😊
       </p>
       <div className="flex items-center">
-        <Link href={"/"}>
+        <Link passHref href={"/"}>
           <a className="text-white font-bold bg-black rounded py-3 px-4 mt-4 mr-4 hover:opacity-90 transition-opacity">
             Go to Homepage
           </a>

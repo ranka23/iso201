@@ -24,7 +24,7 @@ const Hero: React.FC<Props> = ({
       <div>
         <span className="text-3xl font-semibold mb-1">{topHeader}</span>
         <h1 className="text-5xl font-bold mb-4 -ml-1">{largeHeader}</h1>
-        <h4 className="text-lg font-medium max-w-[320px] mb-8">
+        <h4 className="text-lg font-medium max-w-[325px] mb-8">
           {description}
         </h4>
         {showSearch ? <Search margin={false} rounded={false} wider /> : null}

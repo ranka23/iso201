@@ -4,7 +4,7 @@ import PremiumBadge from "components/widgets/PremiumBadge/PremiumBadge"
 import millify from "millify"
 import { useAssetStats } from "network/hooks"
 import { useMemo } from "react"
-import LikeWithCount from "../widgets/Like/LikeWithCount"
+import LikeWithCount from "components/widgets/Like/LikeWithCount"
 
 interface Props {
   id: number

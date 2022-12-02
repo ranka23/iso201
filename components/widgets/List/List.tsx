@@ -1,43 +1,38 @@
-
 import css from "./index.module.css"
 import { useMemo } from "react"
 import AssetThumbnail from "../AssetThumbnail/AssetThumbnail"
 
-
-
 interface ListProps {
-  onScrollData: {
-    hits: Array<ScrollDataHits> | null
-    total: number
-  }
+  onScrollData: ListData
 }
 
 const List: React.FC<ListProps> = ({ onScrollData }) => {
   const data = useMemo(() => {
-    const a: Array<ScrollDataHits> = []
-    const b: Array<ScrollDataHits> = []
-    const c: Array<ScrollDataHits> = []
-    let pause = false
-    let turn = 1
-    onScrollData?.hits?.forEach((item) => {
-      pause = false
-      if (turn === 1 && !pause) {
-        a.push(item)
-        pause = true
-        turn = 2
-      }
-      if (turn === 2 && !pause) {
-        b.push(item)
-        turn = 3
-        pause = true
-      }
-      if (turn === 3 && !pause) {
-        c.push(item)
-        turn = 1
-        pause = true
-      }
-    })
-
+    const a: Array<ListDataHits> = []
+    const b: Array<ListDataHits> = []
+    const c: Array<ListDataHits> = []
+    if (onScrollData?.hits?.length) {
+      let pause = false
+      let turn = 1
+      onScrollData?.hits?.forEach((item) => {
+        pause = false
+        if (turn === 1 && !pause) {
+          a.push(item)
+          pause = true
+          turn = 2
+        }
+        if (turn === 2 && !pause) {
+          b.push(item)
+          turn = 3
+          pause = true
+        }
+        if (turn === 3 && !pause) {
+          c.push(item)
+          turn = 1
+          pause = true
+        }
+      })
+    }
     return {
       a,
       b,

@@ -1,6 +1,7 @@
+import { useAssetStats } from "network/hooks"
 import { useEffect } from "react"
 import { post } from "services/axios"
-import { useAssetStats } from "network/hooks"
+import css from "./index.module.css"
 
 const BunnyPlayer = ({
   videoId,
@@ -27,6 +28,7 @@ const BunnyPlayer = ({
     } catch (error: any) {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
   return (
     <div
       style={{
@@ -44,6 +46,7 @@ const BunnyPlayer = ({
           height: "100%",
           width: "100%",
         }}
+        className={css.iframe}
         allowFullScreen={true}
       />
     </div>

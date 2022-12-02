@@ -1,0 +1,10 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr minmax(auto, 1288px) 1fr;
+  margin: 0 auto;
+}
+
+.filters {
+  display: flex;
+  padding-right: 1rem;
+}

@@ -259,6 +259,46 @@ export default class Asset {
       throw new Error(error)
     }
   }
+
+  async populateFilters(genre?: string) {
+    const _fpsQuery = `SELECT DISTINCT fps FROM assets`
+    const _typeQuery = `SELECT DISTINCT type FROM assets`
+    const _scaleQuery = `SELECT DISTINCT scale FROM assets`
+    const _genreQuery = `SELECT DISTINCT genre FROM assets`
+    const _albumQuery = `SELECT DISTINCT album FROM assets ${
+      genre ? "WHERE genre=$1" : ""
+    }`
+    const _viewsQuery = `SELECT MAX(views) AS views FROM assets`
+    const _likesQuery = `SELECT MAX(likes) AS likes FROM assets`
+    const _durationQuery = `SELECT MAX(duration) AS duration FROM assets`
+    try {
+      await pg().query("BEGIN")
+      const { rows: fpsQuery } = await pg().query(_fpsQuery)
+      const { rows: typeQuery } = await pg().query(_typeQuery)
+      const { rows: scaleQuery } = await pg().query(_scaleQuery)
+      const { rows: genreQuery } = await pg().query(_genreQuery)
+      const { rows: albumQuery } = await pg().query(
+        _albumQuery,
+        genre ? [genre] : undefined
+      )
+      const { rows: viewsQuery } = await pg().query(_viewsQuery)
+      const { rows: likesQuery } = await pg().query(_likesQuery)
+      const { rows: durationQuery } = await pg().query(_durationQuery)
+      await pg().query("COMMIT")
+      return {
+        fpsQuery,
+        typeQuery,
+        scaleQuery,
+        genreQuery,
+        albumQuery,
+        viewsQuery,
+        likesQuery,
+        durationQuery,
+      }
+    } catch (error: any) {
+      await pg().query("ROLLBACK")
+    }
+  }
 }
 
 const makeCallToES = async (asset: Asset, tries = 0) => {

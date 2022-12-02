@@ -241,16 +241,8 @@ interface GetAssetReq {
   sort?: ESSort
 }
 
-interface ScrollData {
-  id: number
-  thumbnail: string
-  type: AssetType
-  scale: [number, number]
-  title: string
-  poster?: string
-}
 
-type ScrollDataHits = {
+type ListDataHits = {
   id: number
   thumbnail: string
   type: AssetType
@@ -260,4 +252,53 @@ type ScrollDataHits = {
   genre: string
   album: string
   duration?: number
+}
+
+interface ListData {
+  total: number,
+  hits: Array<ListDataHits>
+}
+
+interface PopulateFilters {
+  premium?: boolean
+  free?: boolean
+  fps: Array<number>
+  type: Array<AssetType>
+  scale: Array<[number, number]>
+  genre?: Array<string>
+  album?: Array<string>
+  duration?: number
+  views: number
+  location?: string
+}
+
+interface RadioButtonCallback {
+  placeholder: string
+  isChecked: boolean
+  name: keyof PopulateFilters
+}
+
+interface PageProps {
+  head?: {
+    title: string,
+    description: string
+  },
+  hero?: {
+    image: string
+    topHeader: string
+    largeHeader: string
+    description: string
+  }
+  list: {
+    header: {
+      title: string
+      caption: string
+    }
+    data: ListData
+    filters: PopulateFilters
+  }
+  filters?: {
+    showFilters: boolean
+    showFiltersInNav: boolean
+  }
 }

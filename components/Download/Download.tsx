@@ -18,19 +18,19 @@ const Download: React.FC<Props> = ({ fname, id, mime }) => {
   const { dispatch } = useError()
   const downloadAsset = useCallback(
     async ({ url = "", fname = "", mime = "" }) => {
-      fileDownload(url, fname + mime)
-      /*  // create "a" HTML element with href to file & click
+      //fileDownload(url, fname + mime)
+      // create "a" HTML element with href to file & click
       const link = document.createElement("a")
       link.href = url
       link.setAttribute("download", fname + mime) //or any other extension
       document.body.appendChild(link)
       link.click()
+      setIsLoading(false)
       return () => {
         // clean up "a" element & remove ObjectURL
         document.body.removeChild(link)
         URL.revokeObjectURL(url)
-        setIsLoading(false)
-      } */
+      }
     },
     []
   )

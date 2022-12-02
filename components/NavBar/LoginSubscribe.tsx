@@ -30,11 +30,11 @@ const LoginSubscribe = () => {
         <span className="mr-0.5 relative">Pricing</span>
         <Icon className="-rotate-90" src={chevron} />
       </span>
-      <Link href={"/login"}>
+      <Link passHref href={"/login"}>
         <a className={className}>Login</a>
       </Link>
       <span className="px-3 opacity-60">/</span>
-      <Link href="/subscribe">
+      <Link passHref href="/subscribe">
         <a className={className}>Subscribe</a>
       </Link>
       <FadeInOut isTop={true} isVisible={showPricingPopup}>

@@ -48,6 +48,8 @@ export const createESSearchQuery = (data: GetAssetReq) => {
     views,
     operator,
     search,
+    genre,
+    album,
   } = data
 
   const loopData = {
@@ -66,6 +68,8 @@ export const createESSearchQuery = (data: GetAssetReq) => {
     type,
     bitrate,
     views,
+    genre,
+    album,
   }
 
   const filters: FiltersObj = {

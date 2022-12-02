@@ -9,7 +9,7 @@ const FourOFour = () => {
         The page has been removed, had it&rsquo;s name
         changed or is unavailable
       </p>
-      <Link href="/">
+      <Link passHref href="/">
         <a className="py-3 px-4 border border-black font-bold mb-4">Go back to Homepage</a>
       </Link>
       <div className="flex items-center justify-between"><SocialMedia /></div>

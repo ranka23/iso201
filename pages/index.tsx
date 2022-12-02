@@ -1,103 +1,37 @@
+import { getThumbnailData, populateFilter } from "controller/assets"
 import type { NextPage } from "next"
-import styles from "styles/Home.module.css"
-import Hero from "components/pages/Home/Hero/Hero"
-import { getSearch } from "../controller/assets"
-import List from "../components/widgets/List/List"
+import log from "utils/logger"
+import Page from "../components/pages/Page/Page"
 
-interface Props {
-  hero: {
-    image: string
-    topHeader: string
-    largeHeader: string
-    description: string
-  }
-  onScrollData: {
-    hits: Array<{
-      id: number
-      thumbnail: string
-      type: AssetType
-      scale: [number, number]
-      title: string
-      poster?: string
-      genre: string
-      album: string
-    }> | null
-    total: number
-  }
+const Home: NextPage<PageProps> = ({ hero, list }) => {
+  return <Page hero={hero} list={list} />
 }
 
-const Home: NextPage<Props> = ({ hero, onScrollData }: Props) => {
-  return (
-    <div className={styles.container}>
-      <main>
-        <Hero
-          bgURL={hero.image}
-          topHeader={hero.topHeader}
-          description={hero.description}
-          largeHeader={hero.largeHeader}
-        />
-        <div className="mt-12">
-          <List onScrollData={onScrollData} />
-        </div>
-      </main>
-    </div>
-  )
-}
-
-export const getStaticProps = async () => {
-  const homepage = await getSearch({
-    sort: {
-      keywords: [
-        {
-          fieldName: "rating",
-          order: "desc",
+export const getServerSideProps = async () => {
+  try {
+    const data = await getThumbnailData()
+    const filters = await populateFilter()
+    return {
+      props: {
+        hero: {
+          description: "4K & Hi-res resources for the creative mind.",
+          image: "/hero.webp",
+          largeHeader: "Content for Creators",
+          topHeader: "iso201",
         },
-        {
-          fieldName: "created",
-          order: "desc",
+        list: {
+          header: {
+            title: "Unlimited downloads & usage",
+            caption:
+              "Handpicked, 4K stock footage at prices cheaper than Netflix",
+          },
+          data,
+          filters,
         },
-        {
-          fieldName: "likes",
-          order: "desc",
-        },
-        {
-          fieldName: "downloads",
-          order: "desc",
-        },
-        {
-          fieldName: "views",
-          order: "desc",
-        },
-      ],
-      from: 0,
-      size: 100,
-    },
-    provide: [
-      "thumbnail",
-      "type",
-      "id",
-      "scale",
-      "title",
-      "poster",
-      "genre",
-      "album",
-    ],
-  })
-
-  return {
-    props: {
-      hero: {
-        description:
-          "4K and HD videos for your YouTube channel, social media and more...",
-        image: "/hero.webp",
-        largeHeader: "Content for Creators",
-        topHeader: "iso201",
       },
-      onScrollData: {
-        total: homepage?.hits.total,
-        hits: homepage?.hits.hits.map((item) => item._source),
-      },
-    },
+    }
+  } catch (error: any) {
+    log.error("INDEX PAGE SSR ERROR: ", error)
   }
 }
 

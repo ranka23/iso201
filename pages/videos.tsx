@@ -1,23 +1,43 @@
-import Link from "next/link"
-import Hero from "../components/pages/Home/Hero/Hero"
+import { getThumbnailData, populateFilter } from "controller/assets"
+import log from "utils/logger"
+import Page from "../components/pages/Page/Page"
 
-const Videos = () => {
-  return (
-    <main>
-      <Hero
-        bgURL="/video.webp"
-        description="4K and HD Videos for your youtube channel, social media and more..."
-        largeHeader="Videos for Creators"
-        topHeader="iso201"
-      />
-      <div
-        id="video-thumbnail"
-        className="md:columns-3 mt-6 md:w-[80%] m-auto gap-8"
-      >
-      {/* TODO: Thumbnails maps over here */}
-      </div>
-    </main>
-  )
+const Videos: React.FC<PageProps> = ({ hero, list, head }) => {
+  return <Page list={list} head={head} hero={hero} />
+}
+
+export const getServerSideProps = async () => {
+  try {
+    const data = await getThumbnailData({
+      type: "video",
+    })
+    const filters = await populateFilter()
+    return {
+      props: {
+        head: {
+          title: "4K videos for Creators - iso201.com",
+          description:
+            "Free and premium videos for YouTubers, Influencers, Editors, Designers and more",
+        },
+        hero: {
+          description: "4K videos to bring that story to life.",
+          image: "/video.webp",
+          largeHeader: "Content for Creators",
+          topHeader: "iso201",
+        },
+        list: {
+          header: {
+            title: "Amazing 4K Stock Videos",
+            caption: "Unlimited downloads and usage at an amazing price.",
+          },
+          data,
+          filters,
+        },
+      },
+    }
+  } catch (error: any) {
+    log.error("INDEX PAGE SSR ERROR: ", error)
+  }
 }
 
 export default Videos

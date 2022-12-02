@@ -22,7 +22,7 @@ const icons = [
 const SocialMedia = () => (
   <>
     {icons.map((icon) => (
-      <Link key={icon.href} href={icon.href}>
+      <Link passHref key={icon.href} href={icon.href}>
         <a className="mr-3 opacity-60 hover:opacity-100 transition-opacity">
           <Icon src={icon.src} height={16} />
         </a>

@@ -8,7 +8,7 @@ const FiveOFive = () => {
       <p className="text-lg font-medium max-w-xs text-center mb-4">
         There&apos;s been an error on our end. Please retry after sometime.
       </p>
-      <Link href="/">
+      <Link passHref href="/">
         <a className="py-3 px-4 border border-black font-bold mb-4">Go back to Homepage</a>
       </Link>
       <div className="flex items-center justify-between"><SocialMedia /></div>

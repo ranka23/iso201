@@ -4,7 +4,7 @@ const Links = () => {
   return (
     <>
       {links.map((link) => (
-        <Link key={link.href} href={link.href}>
+        <Link passHref key={link.href} href={link.href}>
           <a className="mr-6 opacity-60 font-normal hover:opacity-100 transition-opacity">
             {link.name}
           </a>
